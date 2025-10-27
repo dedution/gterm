@@ -1,0 +1,198 @@
+[gd_scene load_steps=10 format=3 uid="uid://c84qsww8l6awf"]
+
+[ext_resource type="Script" uid="uid://dx0k1rnm7ghqv" path="res://scripts/console_controller.gd" id="1_2j26c"]
+[ext_resource type="Texture2D" uid="uid://b8ad5dmrlpcn3" path="res://graphics/chevron-right.png" id="1_6e84v"]
+[ext_resource type="Theme" uid="uid://b2c12ppu4s4lr" path="res://themes/text_theme.tres" id="2_whr0r"]
+[ext_resource type="Script" uid="uid://bcfw7niumljx5" path="res://scripts/console_command_hints.gd" id="4_08s0j"]
+[ext_resource type="Script" uid="uid://c7nnxl7qshfw6" path="res://scripts/console_logger.gd" id="4_nak3p"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2j26c"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_whr0r"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hpx2j"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nak3p"]
+
+[node name="Console" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_2j26c")
+
+[node name="Container" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 850.835
+grow_horizontal = 2
+
+[node name="Background" type="ColorRect" parent="Container"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18431373, 0.18431373, 0.18431373, 1)
+
+[node name="Input" type="Control" parent="Container"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -51.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="CommandWriter" type="LineEdit" parent="Container/Input"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_right = -1285.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_whr0r")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_2j26c")
+theme_override_styles/read_only = SubResource("StyleBoxEmpty_whr0r")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_hpx2j")
+placeholder_text = "Enter command..."
+context_menu_enabled = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+virtual_keyboard_show_on_focus = false
+middle_mouse_paste_enabled = false
+deselect_on_focus_loss_enabled = false
+drag_and_drop_selection_enabled = false
+flat = true
+caret_blink = true
+caret_blink_interval = 0.3
+
+[node name="CommandIndicator" type="TextureRect" parent="Container/Input"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 12.0
+offset_top = -12.0
+offset_right = 39.0
+offset_bottom = 12.0
+grow_vertical = 2
+pivot_offset = Vector2(17.5, 17.5)
+texture = ExtResource("1_6e84v")
+expand_mode = 1
+
+[node name="Hints" type="Control" parent="Container"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_right = -1285.0
+offset_bottom = 229.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("4_08s0j")
+
+[node name="Background" type="ColorRect" parent="Container/Hints"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18431373, 0.18431373, 0.18431373, 1)
+
+[node name="hints" type="TextEdit" parent="Container/Hints"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_whr0r")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_nak3p")
+placeholder_text = "/load system
+/load system
+/load system
+/load system"
+editable = false
+context_menu_enabled = false
+emoji_menu_enabled = false
+shortcut_keys_enabled = false
+selecting_enabled = false
+deselect_on_focus_loss_enabled = false
+drag_and_drop_selection_enabled = false
+virtual_keyboard_enabled = false
+virtual_keyboard_show_on_focus = false
+middle_mouse_paste_enabled = false
+empty_selection_clipboard_enabled = false
+tab_input_mode = false
+scroll_smooth = true
+use_default_word_separators = false
+
+[node name="Logger" type="Control" parent="Container"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -59.835022
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_nak3p")
+
+[node name="Logs" type="TextEdit" parent="Container/Logger"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_whr0r")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_nak3p")
+text = "[GAME] executing scene loading
+[GAME] loading systems....
+[GAME] preparing....
+[GAME] executing scene loading
+[GAME] loading systems....
+[GAME] preparing....
+[GAME] executing scene loading
+[GAME] loading systems....
+[GAME] preparing....
+[GAME] executing scene loading
+[GAME] loading systems....
+[GAME] preparing....
+[GAME] executing scene loading
+[GAME] loading systems....
+[GAME] preparing....
+[GAME] executing scene loading
+[GAME] loading systems....
+[GAME] preparing....
+[GAME] executing scene loading
+[GAME] loading systems....
+[GAME] preparing....
+[GAME] executing scene loading
+[GAME] loading systems....
+[GAME] preparing...."
+editable = false
+context_menu_enabled = false
+emoji_menu_enabled = false
+shortcut_keys_enabled = false
+selecting_enabled = false
+deselect_on_focus_loss_enabled = false
+drag_and_drop_selection_enabled = false
+virtual_keyboard_enabled = false
+virtual_keyboard_show_on_focus = false
+middle_mouse_paste_enabled = false
+empty_selection_clipboard_enabled = false
+tab_input_mode = false
+scroll_smooth = true
+use_default_word_separators = false

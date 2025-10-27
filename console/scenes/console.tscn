@@ -1,17 +1,16 @@
-[gd_scene load_steps=15 format=3 uid="uid://da1q8ys5wbbtj"]
+[gd_scene load_steps=15 format=3 uid="uid://c84qsww8l6awf"]
 
-[ext_resource type="Script" uid="uid://dx0k1rnm7ghqv" path="res://addons/tools/godot-debug-console/console/scripts/console_controller.gd" id="1_2mre8"]
-[ext_resource type="Theme" uid="uid://b2c12ppu4s4lr" path="res://addons/tools/godot-debug-console/console/themes/text_theme.tres" id="2_kirbc"]
-[ext_resource type="Texture2D" uid="uid://b8ad5dmrlpcn3" path="res://addons/tools/godot-debug-console/console/graphics/chevron-right.png" id="3_es1fy"]
-[ext_resource type="Script" uid="uid://bcfw7niumljx5" path="res://addons/tools/godot-debug-console/console/scripts/console_hints.gd" id="4_umce0"]
-[ext_resource type="Script" uid="uid://c7nnxl7qshfw6" path="res://addons/tools/godot-debug-console/console/scripts/console_logger.gd" id="5_es7mf"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nak3p"]
-content_margin_left = 30.0
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2mre8"]
+[ext_resource type="Script" uid="uid://dx0k1rnm7ghqv" path="res://console/scripts/console_controller.gd" id="1_2mre8"]
+[ext_resource type="Theme" uid="uid://b2c12ppu4s4lr" path="res://console/themes/text_theme.tres" id="2_kirbc"]
+[ext_resource type="Texture2D" uid="uid://b8ad5dmrlpcn3" path="res://console/graphics/chevron-right.png" id="3_es1fy"]
+[ext_resource type="Script" uid="uid://bqqgsfdibecfs" path="res://console/scripts/console_writer.gd" id="4_es1fy"]
+[ext_resource type="Script" uid="uid://bcfw7niumljx5" path="res://console/scripts/console_hints.gd" id="4_umce0"]
+[ext_resource type="Script" uid="uid://c7nnxl7qshfw6" path="res://console/scripts/console_logger.gd" id="5_es7mf"]
+[ext_resource type="FontFile" uid="uid://ltbm7va13t7p" path="res://console/fonts/RobotoMono-Regular.ttf" id="6_kirbc"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kirbc"]
+content_margin_left = 6.0
+content_margin_top = 6.0
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2j26c"]
 
@@ -19,15 +18,14 @@ content_margin_left = 30.0
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hpx2j"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pjwda"]
-content_margin_left = 123.0
-bg_color = Color(0.6, 0.6, 0.6, 0)
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nak3p"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_es1fy"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_umce0"]
 
 [node name="Console" type="Control"]
+process_mode = 3
 clip_contents = true
 layout_mode = 3
 anchors_preset = 15
@@ -42,9 +40,11 @@ script = ExtResource("1_2mre8")
 oversampling_override = 1.0
 title = "Debug Console"
 initial_position = 1
-size = Vector2i(581, 755)
+size = Vector2i(550, 750)
 minimize_disabled = true
 maximize_disabled = true
+min_size = Vector2i(550, 750)
+max_size = Vector2i(1100, 1500)
 
 [node name="Container" type="Control" parent="Window"]
 layout_mode = 3
@@ -79,35 +79,19 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("5_es7mf")
 
-[node name="Logs" type="TextEdit" parent="Window/Container/VBoxContainer/Logger"]
+[node name="Logs" type="RichTextLabel" parent="Window/Container/VBoxContainer/Logger"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("2_kirbc")
-theme_override_font_sizes/font_size = 19
-theme_override_styles/normal = SubResource("StyleBoxEmpty_nak3p")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_2mre8")
-theme_override_styles/read_only = SubResource("StyleBoxEmpty_kirbc")
+theme_override_fonts/normal_font = ExtResource("6_kirbc")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_kirbc")
 text = "[GAME] executing scene loading
 [GAME] loading systems....
 [GAME] preparing...."
-editable = false
-context_menu_enabled = false
-emoji_menu_enabled = false
-shortcut_keys_enabled = false
-selecting_enabled = false
-deselect_on_focus_loss_enabled = false
-drag_and_drop_selection_enabled = false
-virtual_keyboard_enabled = false
-virtual_keyboard_show_on_focus = false
-middle_mouse_paste_enabled = false
-empty_selection_clipboard_enabled = false
-tab_input_mode = false
-scroll_smooth = true
-use_default_word_separators = false
+scroll_following = true
 
 [node name="Input" type="Control" parent="Window/Container/VBoxContainer"]
 custom_minimum_size = Vector2(0, 50)
@@ -128,7 +112,7 @@ pivot_offset = Vector2(17.5, 17.5)
 texture = ExtResource("3_es1fy")
 expand_mode = 1
 
-[node name="CommandWriter" type="LineEdit" parent="Window/Container/VBoxContainer/Input"]
+[node name="CommandEdit" type="LineEdit" parent="Window/Container/VBoxContainer/Input"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -142,7 +126,6 @@ theme_override_styles/normal = SubResource("StyleBoxEmpty_2j26c")
 theme_override_styles/read_only = SubResource("StyleBoxEmpty_whr0r")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_hpx2j")
 placeholder_text = "Enter command..."
-keep_editing_on_text_submit = true
 context_menu_enabled = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false
@@ -153,11 +136,14 @@ drag_and_drop_selection_enabled = false
 flat = true
 caret_blink = true
 caret_blink_interval = 0.3
+script = ExtResource("4_es1fy")
 
-[node name="Hints" type="Control" parent="Window/Container/VBoxContainer"]
-custom_minimum_size = Vector2(0, 100)
+[node name="Hints" type="Control" parent="Window/Container/VBoxContainer" node_paths=PackedStringArray("buttons")]
+clip_contents = true
+custom_minimum_size = Vector2(0, 91.99)
 layout_mode = 2
 script = ExtResource("4_umce0")
+buttons = [NodePath("Root/BoxContainer/Button"), NodePath("Root/BoxContainer/Button2"), NodePath("Root/BoxContainer/Button3"), NodePath("Root/BoxContainer/Button4")]
 
 [node name="Root" type="Control" parent="Window/Container/VBoxContainer/Hints"]
 layout_mode = 1
@@ -167,7 +153,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="background" type="ColorRect" parent="Window/Container/VBoxContainer/Hints/Root"]
+[node name="Background" type="ColorRect" parent="Window/Container/VBoxContainer/Hints/Root"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -177,15 +163,19 @@ grow_vertical = 2
 color = Color(0.165657, 0.165656, 0.165656, 1)
 
 [node name="hints" type="TextEdit" parent="Window/Container/VBoxContainer/Hints/Root"]
+visible = false
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
+anchor_left = 0.105
 anchor_right = 1.0
-anchor_bottom = 1.0
+anchor_bottom = 0.964
+offset_left = -0.005
+offset_bottom = -0.011
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_kirbc")
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("StyleBoxFlat_pjwda")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_nak3p")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_es1fy")
 theme_override_styles/read_only = SubResource("StyleBoxEmpty_umce0")
 editable = false
@@ -202,3 +192,51 @@ empty_selection_clipboard_enabled = false
 tab_input_mode = false
 scroll_smooth = true
 use_default_word_separators = false
+
+[node name="BoxContainer" type="BoxContainer" parent="Window/Container/VBoxContainer/Hints/Root"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.10700001
+anchor_right = 0.61800003
+anchor_bottom = 1.0
+offset_left = 0.1499939
+offset_right = 0.099975586
+offset_bottom = 156.01001
+grow_horizontal = 2
+vertical = true
+
+[node name="Button" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/BoxContainer"]
+custom_minimum_size = Vector2(0, 38.51)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_kirbc")
+theme_override_font_sizes/font_size = 16
+text = "/wait"
+flat = true
+alignment = 0
+
+[node name="Button2" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/BoxContainer"]
+custom_minimum_size = Vector2(0, 38.51)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_kirbc")
+theme_override_font_sizes/font_size = 16
+text = "/wait"
+flat = true
+alignment = 0
+
+[node name="Button3" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/BoxContainer"]
+custom_minimum_size = Vector2(0, 38.51)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_kirbc")
+theme_override_font_sizes/font_size = 16
+text = "/wait"
+flat = true
+alignment = 0
+
+[node name="Button4" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/BoxContainer"]
+custom_minimum_size = Vector2(0, 38.51)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_kirbc")
+theme_override_font_sizes/font_size = 16
+text = "/wait"
+flat = true
+alignment = 0

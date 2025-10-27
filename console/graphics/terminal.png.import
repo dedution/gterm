@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dwkutbvl0141i"
-path="res://.godot/imported/terminal.png-f5a920599e4e4922505bba1a4285f934.ctex"
+path="res://.godot/imported/terminal.png-60b3231297d9af72a778df78e49b9c31.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/tools/godot-debug-console/console/graphics/terminal.png"
-dest_files=["res://.godot/imported/terminal.png-f5a920599e4e4922505bba1a4285f934.ctex"]
+source_file="res://console/graphics/terminal.png"
+dest_files=["res://.godot/imported/terminal.png-60b3231297d9af72a778df78e49b9c31.ctex"]
 
 [params]
 

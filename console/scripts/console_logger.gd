@@ -1,31 +1,43 @@
 class_name ConsoleLogger
 extends Control
 
-@onready var _command_logger : TextEdit = $Logs
-var _booted_with_lines: bool = false
+@onready var _command_logger: RichTextLabel = $Logs
+
+const MAX_LOGS: int = 300
+var _logs: Array[String] = []
 
 func _ready() -> void:
-	Console.log_message.connect(add_log)
+	Console.log_info.connect(add_log_info)
+	Console.log_warn.connect(add_log_warn)
+	Console.log_error.connect(add_log_error)
 	Console.log_clear.connect(clear_log)
-	
-	call_deferred("_scroll_to_bottom")
-	if _command_logger.get_line_count() > 0:
-		_booted_with_lines = true
-		
-func add_log(log_tag: String, output: String) -> void:
-	var tag : String = "[%s]" % log_tag.to_upper()
-	var line = "%s %s" % [tag, output]
-	
-	if _booted_with_lines:
-		line = "\n" + line
-		_booted_with_lines = false
-		
-	_command_logger.text += line + "\n"
-	_scroll_to_bottom()
+	clear_log()
+
+func add_log_info(log_tag: String, output: String) -> void:
+	add_log(log_tag, output, "white")
+
+func add_log_warn(log_tag: String, output: String) -> void:
+	add_log(log_tag, output, "yellow")
+
+func add_log_error(log_tag: String, output: String) -> void:
+	add_log(log_tag, output, "red")
+
+func add_log(log_tag: String, output: String, color: String = "white") -> void:
+	var line: String = "[color=%s][%s] %s[/color]" % [color, log_tag.to_upper(), output]
+	_logs.append(line)
+	if _logs.size() > MAX_LOGS:
+		_logs.pop_front()
+
+	_update_display()
 
 func clear_log() -> void:
-	_command_logger.clear()
-	_scroll_to_bottom()
+	_logs.clear()
+	_update_display()
 
-func _scroll_to_bottom() -> void:
-	_command_logger.scroll_vertical = _command_logger.get_line_count()
+func _update_display() -> void:
+	var bbcode_text: String = ""
+	for log_line in _logs:
+		bbcode_text += log_line + "\n"
+
+	_command_logger.parse_bbcode(bbcode_text)
+	_command_logger.scroll_to_line(_command_logger.get_line_count() - 1)

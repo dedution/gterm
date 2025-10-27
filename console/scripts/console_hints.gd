@@ -1,55 +1,87 @@
 class_name ConsoleHints
 extends Node
-@onready var _hints_label : TextEdit = $Root/hints
 
-var _current_tween: Tween = null
+@onready var _input_writer : ConsoleWriter = $"../Input/CommandEdit"
+@export var buttons : Array[Button]
 
 func _ready() -> void:
-	_animate_root(false)
+	_input_writer.text_changed.connect(process_suggestions)
+	for btn in buttons:
+		btn.pressed.connect(_on_hint_button_pressed.bind(btn))
+		btn.visible = false
 
 func process_suggestions(command: String) -> void:
-	var input := command
-	
-	if input == "":
-		_hints_label.text = ""
-		_animate_root(false)
+	if command == "":
+		_clear_buttons()
 		return
 
-	var all_commands := Console.commands.get_commands()
+	var all_commands: Array[String] = Console.commands.get_commands()
 	var matches: Array[String] = []
 
-	if input == "/":
-		matches = all_commands.duplicate()
-	else:
-		var parts := input.split(" ", false)
-		var user_prefix := parts[0]
-		
-		if user_prefix.begins_with("/"):
-			user_prefix = user_prefix.substr(1, user_prefix.length() - 1)
-		user_prefix = user_prefix.to_lower()
+	var command_parts := command.split(";", false)
+	var last_command := command_parts[command_parts.size() - 1].strip_edges()
 
-		for cmd in all_commands:
-			var cmd_name := str(cmd)
-			if cmd_name.begins_with("/"):
-				cmd_name = cmd_name.substr(1, cmd_name.length() - 1)
-			cmd_name = cmd_name.to_lower()
+	if last_command == "":
+		_clear_buttons()
+		return
 
-			if cmd_name.begins_with(user_prefix):
-				matches.append(str(cmd))
+	var parts := last_command.split(" ", false)
+	if parts.size() == 0:
+		_clear_buttons()
+		return
+
+	var user_prefix := parts[0]
+	if user_prefix.begins_with("/"):
+		user_prefix = user_prefix.substr(1, user_prefix.length() - 1)
+	user_prefix = user_prefix.to_lower()
+
+	# Find matches
+	for cmd in all_commands:
+		var cmd_name := str(cmd)
+		if cmd_name.begins_with("/"):
+			cmd_name = cmd_name.substr(1, cmd_name.length() - 1)
+		cmd_name = cmd_name.to_lower()
+
+		if cmd_name.begins_with(user_prefix):
+			matches.append(str(cmd))
+
+	# Hide hints if the user already typed a command with arguments
+	if matches.has(parts[0]):
+		_clear_buttons()
+		return
 
 	if matches.size() > 0:
-		matches.sort_custom(Callable(self, "_sort_command_matches"))
-		_set_hints(matches)
+		matches.sort_custom(_sort_command_matches)
+		_set_hint_buttons(matches)
 	else:
-		_hints_label.text = ""
-		_animate_root(false)
+		_clear_buttons()
 
-func _set_hints(hints_data: Array) -> void:
-	var out := ""
-	for hint in hints_data:
-		out += str(hint) + "\n"
-	_hints_label.text = out
-	_animate_root(true)
+
+func _set_hint_buttons(hints_data: Array) -> void:
+	for i in range(buttons.size()):
+		if i < hints_data.size():
+			buttons[i].text = hints_data[i]
+			buttons[i].visible = true
+		else:
+			buttons[i].visible = false
+
+func _clear_buttons() -> void:
+	for btn in buttons:
+		btn.visible = false
+
+func _on_hint_button_pressed(button: Button) -> void:
+	var commands: PackedStringArray = _input_writer.text.split(";", false) # PackedStringArray
+	commands[commands.size() - 1] = button.text
+	
+	var commands_final: String = ""
+	for cmd_id in range(0, commands.size()):
+		commands_final += commands[cmd_id]
+		if cmd_id != commands.size() -1:
+			commands_final += ";"
+	
+	_input_writer.text = commands_final
+	_input_writer.emit_signal("text_changed", _input_writer.text)
+
 
 func _sort_command_matches(a, b) -> int:
 	if a.length() < b.length():
@@ -57,7 +89,6 @@ func _sort_command_matches(a, b) -> int:
 	elif a.length() > b.length():
 		return 1
 	else:
-		# Same length -> alphabetical order
 		var a_lower := str(a).to_lower()
 		var b_lower := str(b).to_lower()
 		if a_lower < b_lower:
@@ -66,6 +97,3 @@ func _sort_command_matches(a, b) -> int:
 			return 1
 		else:
 			return 0
-
-func _animate_root(showing: bool) -> void:
-	_hints_label.scroll_vertical = 0
