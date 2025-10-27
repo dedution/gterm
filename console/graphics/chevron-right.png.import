@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b8ad5dmrlpcn3"
-path="res://.godot/imported/chevron-right.png-31fc0c5bc6735f7710905693e00e0c8f.ctex"
+path="res://.godot/imported/chevron-right.png-69fa5035fbc2efabe9a1f6cf55e2508c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://console/graphics/chevron-right.png"
-dest_files=["res://.godot/imported/chevron-right.png-31fc0c5bc6735f7710905693e00e0c8f.ctex"]
+source_file="res://addons/tools/godot-debug-console/console/graphics/chevron-right.png"
+dest_files=["res://.godot/imported/chevron-right.png-69fa5035fbc2efabe9a1f6cf55e2508c.ctex"]
 
 [params]
 
