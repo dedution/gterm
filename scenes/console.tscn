@@ -1,12 +1,12 @@
 [gd_scene load_steps=15 format=3 uid="uid://c84qsww8l6awf"]
 
-[ext_resource type="Script" uid="uid://dx0k1rnm7ghqv" path="res://console/scripts/console_controller.gd" id="1_2mre8"]
-[ext_resource type="Theme" uid="uid://b2c12ppu4s4lr" path="res://console/themes/text_theme.tres" id="2_kirbc"]
-[ext_resource type="Texture2D" uid="uid://b8ad5dmrlpcn3" path="res://console/graphics/chevron-right.png" id="3_es1fy"]
-[ext_resource type="Script" uid="uid://bqqgsfdibecfs" path="res://console/scripts/console_writer.gd" id="4_es1fy"]
-[ext_resource type="Script" uid="uid://bcfw7niumljx5" path="res://console/scripts/console_hints.gd" id="4_umce0"]
-[ext_resource type="Script" uid="uid://c7nnxl7qshfw6" path="res://console/scripts/console_logger.gd" id="5_es7mf"]
-[ext_resource type="FontFile" uid="uid://ltbm7va13t7p" path="res://console/fonts/RobotoMono-Regular.ttf" id="6_kirbc"]
+[ext_resource type="Script" uid="uid://dx0k1rnm7ghqv" path="res://godot-debug-console/scripts/console_controller.gd" id="1_2mre8"]
+[ext_resource type="Theme" uid="uid://b2c12ppu4s4lr" path="res://godot-debug-console/themes/text_theme.tres" id="2_kirbc"]
+[ext_resource type="Texture2D" uid="uid://b8ad5dmrlpcn3" path="res://godot-debug-console/graphics/chevron-right.png" id="3_es1fy"]
+[ext_resource type="Script" uid="uid://bqqgsfdibecfs" path="res://godot-debug-console/scripts/console_writer.gd" id="4_es1fy"]
+[ext_resource type="Script" uid="uid://bcfw7niumljx5" path="res://godot-debug-console/scripts/console_hints.gd" id="4_umce0"]
+[ext_resource type="Script" uid="uid://c7nnxl7qshfw6" path="res://godot-debug-console/scripts/console_logger.gd" id="5_es7mf"]
+[ext_resource type="FontFile" uid="uid://ltbm7va13t7p" path="res://godot-debug-console/fonts/RobotoMono-Regular.ttf" id="6_kirbc"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kirbc"]
 content_margin_left = 6.0
@@ -38,13 +38,14 @@ script = ExtResource("1_2mre8")
 
 [node name="Window" type="Window" parent="."]
 oversampling_override = 1.0
-title = "Debug Console"
+title = "GTERM"
 initial_position = 1
 size = Vector2i(550, 750)
 minimize_disabled = true
 maximize_disabled = true
 min_size = Vector2i(550, 750)
 max_size = Vector2i(1100, 1500)
+theme_override_colors/title_color = Color(0, 0.8527348, 0, 1)
 
 [node name="Container" type="Control" parent="Window"]
 layout_mode = 3
@@ -103,12 +104,12 @@ layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = 12.0
-offset_top = -12.0
-offset_right = 39.0
-offset_bottom = 12.0
+offset_left = 25.125
+offset_top = -8.665001
+offset_right = 45.125
+offset_bottom = 11.335049
 grow_vertical = 2
-pivot_offset = Vector2(17.5, 17.5)
+pivot_offset = Vector2(10, 10)
 texture = ExtResource("3_es1fy")
 expand_mode = 1
 
@@ -121,6 +122,7 @@ offset_left = 63.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_kirbc")
+theme_override_fonts/font = ExtResource("6_kirbc")
 theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxEmpty_2j26c")
 theme_override_styles/read_only = SubResource("StyleBoxEmpty_whr0r")

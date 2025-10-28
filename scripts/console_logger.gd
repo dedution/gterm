@@ -11,7 +11,13 @@ func _ready() -> void:
 	Console.log_warn.connect(add_log_warn)
 	Console.log_error.connect(add_log_error)
 	Console.log_clear.connect(clear_log)
+	print_into()
+	
+func print_into() -> void:
 	clear_log()
+	_logs.append("[color=green] Welcome to GTERM by Fabio B [/color]")
+	_logs.append("[color=green] Version %s [/color]" % Console.get_version())
+	_update_display()
 
 func add_log_info(log_tag: String, output: String) -> void:
 	add_log(log_tag, output, "white")

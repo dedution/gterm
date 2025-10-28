@@ -2,6 +2,9 @@ class_name ConsoleCommands
 
 var _registered_commands: Dictionary = {}
 
+func _init() -> void:
+	_register_internal_commands()
+
 func get_commands() -> Array[String]:
 	var result: Array[String] = []
 	for key in _registered_commands.keys():
@@ -131,3 +134,106 @@ func run_command(command_full: String) -> void:
 
 		# Process each command asynchronously
 		await _process_command(tokens)
+
+
+func _register_internal_commands() -> void:
+	# /wait command
+	register_command("/wait", [Argument.new("time", TYPE_FLOAT)], func(args: Dictionary) -> void:
+		var time: float = args["time"]
+		await Console.get_tree().create_timer(time).timeout
+		Console.log_info.emit("console", "Waited %.1f" % time)
+	)
+	
+	# /loadmod command
+	#register_command("/loadmod", [Argument.new("file_name", TYPE_STRING)], func(args: Dictionary) -> void:
+		#Console.log_info.emit("console", "Loading mod from: %s" % args["file_name"])
+	#)
+	
+	# /storage command
+	#register_command("/storage", [Argument.new("mode", TYPE_STRING), Argument.new("id", TYPE_STRING), Argument.new("data", TYPE_STRING)], func(args: Dictionary) -> void:
+		## Console.log_info.emit("console", "Calling storage doing %s on id %s" % [args["mode"], args["id"]])
+		#match args["mode"]:
+			#"get":
+				#Console.log_info.emit("storage", "%s" % GameManager.get_data_from_nv(args["id"]))
+			#"set":
+				#GameManager.save_data_to_nv(args["id"], args["data"])
+			#_:
+				#Console.log_error.emit("console", "Unknown storage operation. Try get or set")
+	#)
+	
+	# /help command
+	register_command("/help", [], _cmd_help)
+
+	# /clear command
+	register_command("/clear", [], func(args: Dictionary) -> void:
+		Console.log_clear.emit()
+	)
+	
+	# /pause command
+	register_command("/pause", [Argument.new("pause", TYPE_BOOL)], _cmd_pause)
+	
+	# /set command
+	register_command("/set", [
+		Argument.new("node_path", TYPE_STRING),
+		Argument.new("property", TYPE_STRING),
+		Argument.new("value", TYPE_STRING)
+	], _cmd_set)
+	
+	# /version command
+	register_command("/version", [], func(args: Dictionary) -> void:
+		Console.log_info.emit("console", "Console version: %s" % Console.get_version())
+	)
+	
+	# /fps command
+	register_command("/fps", [], func(args: Dictionary) -> void:
+		Console.log_info.emit("console", "Current FPS: %s" % str(Engine.get_frames_per_second()))
+	)
+	
+	# /print command
+	register_command("/print", [Argument.new("quote", TYPE_STRING)], func(args: Dictionary) -> void:
+		Console.log_info.emit("console", args["quote"])
+	)
+
+#region Internal
+func _cmd_pause(args: Dictionary) -> void:
+	var pause: bool = true
+	if args.has("pause"):
+		pause = args["pause"]
+	
+	# get_tree().paused = pause
+	Console.log_info.emit("console", "Game paused: %s" % str(pause))
+
+func _cmd_set(args: Dictionary) -> void:
+	var node_path: String = args["node_path"]
+	var property_name: String = args["property"]
+	var value_str: String = args["value"]
+
+	var target_node := Console.get_node_or_null(node_path)
+	if target_node == null:
+		Console.log_error.emit("console", "Node not found: %s" % node_path)
+		return
+
+	# Try to convert the value to a sensible type
+	var value: Variant = value_str
+	if _is_valid_int(value_str):
+		value = int(value_str)
+	elif value_str.is_valid_float():
+		value = float(value_str)
+	elif value_str.to_lower() in ["true", "false"]:
+		value = value_str.to_lower() == "true"
+
+	if not target_node.has_property(property_name):
+		Console.log_error.emit("console", "Property '%s' not found on node %s" % [property_name, node_path])
+		return
+
+	target_node.set(property_name, value)
+	Console.log_info.emit("console", "Set %s.%s = %s" % [node_path, property_name, str(value)])
+
+func _cmd_help(args: Dictionary) -> void:
+	var all_cmds: Array[String] = get_commands()
+	if all_cmds.size() == 0:
+		Console.log_error.emit("console", " - No commands registered -")
+	else:
+		Console.log_info.emit("console", "Available commands:")
+		for cmd in all_cmds:
+			Console.log_info.emit("console", "  " + cmd)
