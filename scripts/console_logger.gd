@@ -5,15 +5,46 @@ extends Control
 
 const MAX_LOGS: int = 300
 var _logs: Array[String] = []
+var _first_time: bool = true
 
-func _ready() -> void:
-	print_into()
+func open_console() -> void:
+	_print_intro()
 	
-func print_into() -> void:
+func _print_intro() -> void:
+	if _first_time:
+		_first_time = false
+	else:
+		return
+
 	clear_log()
+
+	var ascii_art: String = r"""
+	  ______     ______   ______     ______     __    __    
+	 /\  ___\   /\__  _\ /\  ___\   /\  == \   /\ "-./  \   
+	 \ \ \__ \  \/_/\ \/ \ \  __\   \ \  __<   \ \ \-./\ \  
+	  \ \_____\    \ \_\  \ \_____\  \ \_\ \_\  \ \_\ \ \_\ 
+	   \/_____/     \/_/   \/_____/   \/_/ /_/   \/_/  \/_/
+	"""
+	var current_text = ""
+	
+	# Animate the ascii art
+	var frame_count : int = 0
+	var chars_per_frame : int = 3
+	for char in ascii_art:
+		current_text += char
+		frame_count += 1
+		if frame_count >= chars_per_frame:
+			frame_count = 0
+			_logs.clear()
+			_logs.append("[color=green]%s[/color]" % current_text)
+			_update_display()
+			await get_tree().process_frame
+
+	# Footer
 	_logs.append("[color=green] Welcome to GTERM by Fabio B [/color]")
 	_logs.append("[color=green] Version %s [/color]" % Console.get_version())
 	_update_display()
+
 
 func add_log_info(log_tag: String, output: String) -> void:
 	add_log(log_tag, output, "white")

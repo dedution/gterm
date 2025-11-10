@@ -15,6 +15,7 @@ func _open_menu() -> void:
 	console_window.visible = true
 	console_window.grab_focus()
 	console_writer.grab_focus()
+	console_logger.open_console()
 	
 func _close_menu() -> void:
 	console_window.visible = false
