@@ -149,21 +149,9 @@ func _register_internal_commands() -> void:
 	)
 	
 	# /loadmod command
-	#register_command("/loadmod", [Argument.new("file_name", TYPE_STRING)], func(args: Dictionary) -> void:
-		#Console.log_info("console", "Loading mod from: %s" % args["file_name"])
-	#)
-	
-	# /storage command
-	#register_command("/storage", [Argument.new("mode", TYPE_STRING), Argument.new("id", TYPE_STRING), Argument.new("data", TYPE_STRING)], func(args: Dictionary) -> void:
-		## Console.log_info("console", "Calling storage doing %s on id %s" % [args["mode"], args["id"]])
-		#match args["mode"]:
-			#"get":
-				#Console.log_info("storage", "%s" % GameManager.get_data_from_nv(args["id"]))
-			#"set":
-				#GameManager.save_data_to_nv(args["id"], args["data"])
-			#_:
-				#Console.log_error("console", "Unknown storage operation. Try get or set")
-	#)
+	register_command("/loadmod", [Argument.new("file_name", TYPE_STRING)], func(args: Dictionary) -> void:
+		Console.log_info("console", "Loading mod from: %s" % args["file_name"])
+	)
 	
 	# /help command
 	register_command("/help", [], _cmd_help)
@@ -180,7 +168,7 @@ func _register_internal_commands() -> void:
 		if args.has("pause"):
 			pause = args["pause"]
 		
-		# get_tree().paused = pause
+		Console.get_tree().paused = pause
 		Console.log_info("console", "Game paused: %s" % str(pause))
 	)
 	
