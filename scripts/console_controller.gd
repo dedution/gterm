@@ -5,6 +5,7 @@ extends Control
 @onready var console_writer : ConsoleWriter = $Window/Container/VBoxContainer/Input/CommandEdit
 @onready var console_logger : ConsoleLogger = $Window/Container/VBoxContainer/Logger
 
+
 func _ready() -> void:
 	console_window.close_requested.connect(_close_menu)
 	console_writer.text_submit.connect(_on_input_submitted)
@@ -23,10 +24,15 @@ func _input(event):
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F12 and Console.console_is_allowed():
 		_open_menu()
 		
-func _on_input_submitted(command: String) -> void:	
+func _on_input_submitted(command: String) -> void:
+	console_writer.release_focus()
+	console_writer.editable = false
+	
 	if not Console.console_is_allowed():
 		Console.log_error("console", "No execution permissions.")
 		return
 	
 	Console.log_info("console", command)
 	await Console.commands.run_command(command)
+	console_writer.editable = true
+	console_writer.grab_focus()
