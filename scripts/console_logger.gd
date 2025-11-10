@@ -7,10 +7,6 @@ const MAX_LOGS: int = 300
 var _logs: Array[String] = []
 
 func _ready() -> void:
-	Console.log_info.connect(add_log_info)
-	Console.log_warn.connect(add_log_warn)
-	Console.log_error.connect(add_log_error)
-	Console.log_clear.connect(clear_log)
 	print_into()
 	
 func print_into() -> void:

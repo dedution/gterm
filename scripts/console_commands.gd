@@ -63,7 +63,7 @@ func _type_to_string(type_const: int) -> String:
 # Process a single command (array of tokens)
 func _process_command(tokens: Array) -> void:
 	if tokens.size() == 0 or not _registered_commands.has(tokens[0]):
-		Console.log_error.emit("console", "Failed to execute command %s" % tokens[0])
+		Console.log_error("console", "Failed to execute command %s" % tokens[0])
 		return
 
 	var command_name: String = tokens[0]
@@ -71,11 +71,11 @@ func _process_command(tokens: Array) -> void:
 	var action: Callable = _registered_commands[command_name].action
 
 	if arg_defs.size() != tokens.size() - 1:
-		Console.log_error.emit("console", "Arguments for command %s don't match" % command_name)
-		Console.log_info.emit("console", "Definition:")
-		Console.log_info.emit("console", "-- Command name: %s" % command_name)
+		Console.log_error("console", "Arguments for command %s don't match" % command_name)
+		Console.log_info("console", "Definition:")
+		Console.log_info("console", "-- Command name: %s" % command_name)
 		for arg_def in arg_defs:
-			Console.log_info.emit("console", "-- Argument: %s" % arg_def.argument_name)
+			Console.log_info("console", "-- Argument: %s" % arg_def.argument_name)
 		return
 
 	var parsed_args: Dictionary = {}
@@ -109,14 +109,18 @@ func _process_command(tokens: Array) -> void:
 				value = raw_value
 
 		if parse_error:
-			Console.log_error.emit("console", "Argument '%s' has invalid type. Expected %s" % [arg_def.argument_name, _type_to_string(arg_def.value_type)])
+			Console.log_error("console", "Argument '%s' has invalid type. Expected %s" % [arg_def.argument_name, _type_to_string(arg_def.value_type)])
 			return
 
 		parsed_args[arg_def.argument_name] = value
 
 	await action.call(parsed_args)
+	
 # Main entry
 func run_command(command_full: String) -> void:
+	if not Console.console_is_allowed():
+		return
+		
 	var commands: Array[String] = _split_commands(command_full)
 
 	var regex := RegEx.new()
@@ -131,7 +135,7 @@ func run_command(command_full: String) -> void:
 			if token.begins_with('"') and token.ends_with('"'):
 				token = token.substr(1, token.length() - 2)
 			tokens.append(token)
-
+			
 		# Process each command asynchronously
 		await _process_command(tokens)
 
@@ -141,36 +145,44 @@ func _register_internal_commands() -> void:
 	register_command("/wait", [Argument.new("time", TYPE_FLOAT)], func(args: Dictionary) -> void:
 		var time: float = args["time"]
 		await Console.get_tree().create_timer(time).timeout
-		Console.log_info.emit("console", "Waited %.1f" % time)
+		Console.log_info("console", "Waited %.1f" % time)
 	)
 	
 	# /loadmod command
 	#register_command("/loadmod", [Argument.new("file_name", TYPE_STRING)], func(args: Dictionary) -> void:
-		#Console.log_info.emit("console", "Loading mod from: %s" % args["file_name"])
+		#Console.log_info("console", "Loading mod from: %s" % args["file_name"])
 	#)
 	
 	# /storage command
 	#register_command("/storage", [Argument.new("mode", TYPE_STRING), Argument.new("id", TYPE_STRING), Argument.new("data", TYPE_STRING)], func(args: Dictionary) -> void:
-		## Console.log_info.emit("console", "Calling storage doing %s on id %s" % [args["mode"], args["id"]])
+		## Console.log_info("console", "Calling storage doing %s on id %s" % [args["mode"], args["id"]])
 		#match args["mode"]:
 			#"get":
-				#Console.log_info.emit("storage", "%s" % GameManager.get_data_from_nv(args["id"]))
+				#Console.log_info("storage", "%s" % GameManager.get_data_from_nv(args["id"]))
 			#"set":
 				#GameManager.save_data_to_nv(args["id"], args["data"])
 			#_:
-				#Console.log_error.emit("console", "Unknown storage operation. Try get or set")
+				#Console.log_error("console", "Unknown storage operation. Try get or set")
 	#)
 	
 	# /help command
 	register_command("/help", [], _cmd_help)
 
 	# /clear command
-	register_command("/clear", [], func(args: Dictionary) -> void:
-		Console.log_clear.emit()
+	register_command("/clear", [], func(_args: Dictionary) -> void:
+		Console.log_clear()
 	)
 	
 	# /pause command
-	register_command("/pause", [Argument.new("pause", TYPE_BOOL)], _cmd_pause)
+	# Review how this could function
+	register_command("/pause", [Argument.new("pause", TYPE_BOOL)], func(args: Dictionary) -> void:
+		var pause: bool = true
+		if args.has("pause"):
+			pause = args["pause"]
+		
+		# get_tree().paused = pause
+		Console.log_info("console", "Game paused: %s" % str(pause))
+	)
 	
 	# /set command
 	register_command("/set", [
@@ -180,29 +192,28 @@ func _register_internal_commands() -> void:
 	], _cmd_set)
 	
 	# /version command
-	register_command("/version", [], func(args: Dictionary) -> void:
-		Console.log_info.emit("console", "Console version: %s" % Console.get_version())
+	register_command("/version", [], func(_args: Dictionary) -> void:
+		Console.log_info("console", "Console version: %s" % Console.get_version())
 	)
 	
 	# /fps command
-	register_command("/fps", [], func(args: Dictionary) -> void:
-		Console.log_info.emit("console", "Current FPS: %s" % str(Engine.get_frames_per_second()))
+	register_command("/fps", [], func(_args: Dictionary) -> void:
+		Console.log_info("console", "Current FPS: %s" % str(Engine.get_frames_per_second()))
+	)
+	
+	# /network command
+	register_command("/network", [], func(_args: Dictionary) -> void:
+		Console.log_info("console", "Local addresses:")
+		for addr in IP.get_local_addresses():
+			Console.log_info("console", "%s" % str(addr))
 	)
 	
 	# /print command
 	register_command("/print", [Argument.new("quote", TYPE_STRING)], func(args: Dictionary) -> void:
-		Console.log_info.emit("console", args["quote"])
+		Console.log_info("console", args["quote"])
 	)
 
 #region Internal
-func _cmd_pause(args: Dictionary) -> void:
-	var pause: bool = true
-	if args.has("pause"):
-		pause = args["pause"]
-	
-	# get_tree().paused = pause
-	Console.log_info.emit("console", "Game paused: %s" % str(pause))
-
 func _cmd_set(args: Dictionary) -> void:
 	var node_path: String = args["node_path"]
 	var property_name: String = args["property"]
@@ -210,7 +221,7 @@ func _cmd_set(args: Dictionary) -> void:
 
 	var target_node := Console.get_node_or_null(node_path)
 	if target_node == null:
-		Console.log_error.emit("console", "Node not found: %s" % node_path)
+		Console.log_error("console", "Node not found: %s" % node_path)
 		return
 
 	# Try to convert the value to a sensible type
@@ -223,17 +234,18 @@ func _cmd_set(args: Dictionary) -> void:
 		value = value_str.to_lower() == "true"
 
 	if not target_node.has_property(property_name):
-		Console.log_error.emit("console", "Property '%s' not found on node %s" % [property_name, node_path])
+		Console.log_error("console", "Property '%s' not found on node %s" % [property_name, node_path])
 		return
 
 	target_node.set(property_name, value)
-	Console.log_info.emit("console", "Set %s.%s = %s" % [node_path, property_name, str(value)])
+	Console.log_info("console", "Set %s.%s = %s" % [node_path, property_name, str(value)])
 
-func _cmd_help(args: Dictionary) -> void:
+# Print all registered commands
+func _cmd_help(_args: Dictionary) -> void:
 	var all_cmds: Array[String] = get_commands()
 	if all_cmds.size() == 0:
-		Console.log_error.emit("console", " - No commands registered -")
+		Console.log_error("console", " - No commands registered -")
 	else:
-		Console.log_info.emit("console", "Available commands:")
+		Console.log_info("console", "Available commands:")
 		for cmd in all_cmds:
-			Console.log_info.emit("console", "  " + cmd)
+			Console.log_info("console", "  " + cmd)
