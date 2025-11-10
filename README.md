@@ -1,4 +1,13 @@
-GTERM – Godot Terminal
+```
+  ______     ______   ______     ______     __    __    
+ /\  ___\   /\__  _\ /\  ___\   /\  == \   /\ "-./  \   
+ \ \ \__ \  \/_/\ \/ \ \  __\   \ \  __<   \ \ \-./\ \  
+  \ \_____\    \ \_\  \ \_____\  \ \_\ \_\  \ \_\ \ \_\ 
+   \/_____/     \/_/   \/_____/   \/_/ /_/   \/_/  \/_/
+```
+
+
+# GTERM – Godot Terminal
 =======================================
 
 GTERM is a custom in-game console for Godot designed for debugging, testing, and developer tools. 
@@ -39,14 +48,11 @@ Register a custom command:
         Console.log_info("console", "Hello, %s!" % args["name"])
     )
 
-Execute a command:
-
-    Console._process_command("/greet Fabio")
-
 Log messages:
 
     Console.log_info("console", "Custom message here")
-    Console._update_display()
+    Console.log_warn("console", "Custom message here")
+    Console.log_error("console", "Custom message here")
 
 ---
 
