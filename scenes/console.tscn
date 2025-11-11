@@ -43,7 +43,7 @@ initial_position = 1
 size = Vector2i(620, 750)
 minimize_disabled = true
 maximize_disabled = true
-min_size = Vector2i(550, 750)
+min_size = Vector2i(620, 750)
 max_size = Vector2i(1100, 1500)
 theme_override_colors/title_color = Color(0, 0.8527348, 0, 1)
 
@@ -142,10 +142,10 @@ script = ExtResource("4_es1fy")
 
 [node name="Hints" type="Control" parent="Window/Container/VBoxContainer" node_paths=PackedStringArray("buttons")]
 clip_contents = true
-custom_minimum_size = Vector2(0, 91.99)
+custom_minimum_size = Vector2(0, 125)
 layout_mode = 2
 script = ExtResource("4_umce0")
-buttons = [NodePath("Root/BoxContainer/Button"), NodePath("Root/BoxContainer/Button2"), NodePath("Root/BoxContainer/Button3"), NodePath("Root/BoxContainer/Button4")]
+buttons = [NodePath("Root/BoxContainer/Button"), NodePath("Root/BoxContainer/Button2"), NodePath("Root/BoxContainer/Button3")]
 
 [node name="Root" type="Control" parent="Window/Container/VBoxContainer/Hints"]
 layout_mode = 1
@@ -198,13 +198,11 @@ use_default_word_separators = false
 [node name="BoxContainer" type="BoxContainer" parent="Window/Container/VBoxContainer/Hints/Root"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.10700001
-anchor_right = 0.61800003
+anchor_left = 0.102
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0.1499939
-offset_right = 0.099975586
-offset_bottom = 156.01001
 grow_horizontal = 2
+grow_vertical = 2
 vertical = true
 
 [node name="Button" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/BoxContainer"]
@@ -226,15 +224,6 @@ flat = true
 alignment = 0
 
 [node name="Button3" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/BoxContainer"]
-custom_minimum_size = Vector2(0, 38.51)
-layout_mode = 2
-theme_override_fonts/font = ExtResource("6_kirbc")
-theme_override_font_sizes/font_size = 16
-text = "/wait"
-flat = true
-alignment = 0
-
-[node name="Button4" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/BoxContainer"]
 custom_minimum_size = Vector2(0, 38.51)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_kirbc")

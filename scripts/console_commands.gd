@@ -141,15 +141,8 @@ func run_command(command_full: String) -> void:
 
 
 func _register_internal_commands() -> void:
-	# /wait command
-	register_command("/wait", [Argument.new("time", TYPE_FLOAT)], func(args: Dictionary) -> void:
-		var time: float = args["time"]
-		await Console.get_tree().create_timer(time).timeout
-		Console.log_info("console", "Waited %.1f" % time)
-	)
-	
-	# /loadmod command
-	register_command("/loadmod", [Argument.new("file_name", TYPE_STRING)], func(args: Dictionary) -> void:
+	# /load_mod command
+	register_command("/load_mod", [Argument.new("file_name", TYPE_STRING)], func(args: Dictionary) -> void:
 		Console.log_info("console", "Loading mod from: %s" % args["file_name"])
 	)
 	
@@ -187,6 +180,12 @@ func _register_internal_commands() -> void:
 	# /fps command
 	register_command("/fps", [], func(_args: Dictionary) -> void:
 		Console.log_info("console", "Current FPS: %s" % str(Engine.get_frames_per_second()))
+	)
+	
+	# /resolution command
+	register_command("/resolution", [], func(_args: Dictionary) -> void:
+		var size = DisplayServer.window_get_size()
+		Console.log_info("console", "Current resolution: %dx%d" % [size.x, size.y])
 	)
 	
 	# /network command

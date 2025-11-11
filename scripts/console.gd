@@ -7,7 +7,7 @@ var console_controller: ConsoleController
 func _ready() -> void:
 	commands = ConsoleCommands.new()
 	
-	if Console.console_is_allowed():
+	if console_is_allowed():
 		_spawn_menu()
 
 func _spawn_menu() -> void:
@@ -24,8 +24,6 @@ func get_version() -> String:
 	
 func console_is_allowed() -> bool:
 	return OS.is_debug_build()
-	# to hide when running in editor
-	# and not Engine.is_editor_hint()
 
 #region Logging
 func log_info(log_tag: String, log : String) -> void:
