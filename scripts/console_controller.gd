@@ -30,10 +30,26 @@ func _on_input_submitted(command: String) -> void:
 	console_writer.editable = false
 	
 	if not Console.console_is_allowed():
-		Console.log_error("console", "No execution permissions.")
+		log_error("console", "No execution permissions.")
 		return
 	
-	Console.log_info("console", command)
-	await Console.commands.run_command(command)
+	log_info("console", command)
+	await Console.run_command(self, command)
 	console_writer.editable = true
 	console_writer.grab_focus()
+
+func log_info(log_tag: String, log : String) -> void:
+	if console_logger:
+		console_logger.add_log_info(log_tag, log)
+		
+func log_warn(log_tag: String, log : String) -> void:
+	if console_logger:
+		console_logger.add_log_warn(log_tag, log)
+
+func log_error(log_tag: String, log : String) -> void:
+	if console_logger:
+		console_logger.add_log_error(log_tag, log)
+
+func log_clear() -> void:
+	if console_logger:
+		console_logger.clear_log()

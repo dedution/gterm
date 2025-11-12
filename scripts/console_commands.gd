@@ -61,9 +61,9 @@ func _type_to_string(type_const: int) -> String:
 		_: return "variant"
 
 # Process a single command (array of tokens)
-func _process_command(tokens: Array) -> void:
+func _process_command(controller: ConsoleController, tokens: Array) -> void:
 	if tokens.size() == 0 or not _registered_commands.has(tokens[0]):
-		Console.log_error("console", "Failed to execute command %s" % tokens[0])
+		controller.log_error("console", "Failed to execute command %s" % tokens[0])
 		return
 
 	var command_name: String = tokens[0]
@@ -71,11 +71,11 @@ func _process_command(tokens: Array) -> void:
 	var action: Callable = _registered_commands[command_name].action
 
 	if arg_defs.size() != tokens.size() - 1:
-		Console.log_error("console", "Arguments for command %s don't match" % command_name)
-		Console.log_info("console", "Definition:")
-		Console.log_info("console", "-- Command name: %s" % command_name)
+		controller.log_error("console", "Arguments for command %s don't match" % command_name)
+		controller.log_info("console", "Definition:")
+		controller.log_info("console", "-- Command name: %s" % command_name)
 		for arg_def in arg_defs:
-			Console.log_info("console", "-- Argument: %s" % arg_def.argument_name)
+			controller.log_info("console", "-- Argument: %s" % arg_def.argument_name)
 		return
 
 	var parsed_args: Dictionary = {}
@@ -109,15 +109,15 @@ func _process_command(tokens: Array) -> void:
 				value = raw_value
 
 		if parse_error:
-			Console.log_error("console", "Argument '%s' has invalid type. Expected %s" % [arg_def.argument_name, _type_to_string(arg_def.value_type)])
+			controller.log_error("console", "Argument '%s' has invalid type. Expected %s" % [arg_def.argument_name, _type_to_string(arg_def.value_type)])
 			return
 
 		parsed_args[arg_def.argument_name] = value
 
-	await action.call(parsed_args)
+	await action.call(controller, parsed_args)
 	
 # Main entry
-func run_command(command_full: String) -> void:
+func run_command(controller: ConsoleController, command_full: String) -> void:
 	if not Console.console_is_allowed():
 		return
 		
@@ -137,32 +137,46 @@ func run_command(command_full: String) -> void:
 			tokens.append(token)
 			
 		# Process each command asynchronously
-		await _process_command(tokens)
+		await _process_command(controller, tokens)
 
 
 func _register_internal_commands() -> void:
 	# /load_mod command
-	register_command("/load_mod", [Argument.new("file_name", TYPE_STRING)], func(args: Dictionary) -> void:
-		Console.log_info("console", "Loading mod from: %s" % args["file_name"])
+	register_command("/load_mod", [Argument.new("file_name", TYPE_STRING)], func(controller: ConsoleController, args: Dictionary) -> void:
+		var mod_file: String = ""
+		if args.has("file_name"):
+			mod_file = args["file_name"]
+			
+		mod_file = ProjectSettings.globalize_path(mod_file)
+			
+		if mod_file.is_empty() or not FileAccess.file_exists(mod_file):
+			controller.log_warn("PCKLoader", "PCK file not found: %s" % mod_file)
+			return
+		
+		var success: bool = ProjectSettings.load_resource_pack(mod_file)
+		if success:
+			controller.log_info("PCKLoader", "Successfully loaded: %s" % mod_file)
+		else:
+			controller.log_error("PCKLoader", "Failed to load PCK: %s" % mod_file)
 	)
 	
 	# /help command
 	register_command("/help", [], _cmd_help)
 
 	# /clear command
-	register_command("/clear", [], func(_args: Dictionary) -> void:
-		Console.log_clear()
+	register_command("/clear", [], func(controller: ConsoleController, _args: Dictionary) -> void:
+		controller.log_clear()
 	)
 	
 	# /pause command
 	# Review how this could function
-	register_command("/pause", [Argument.new("pause", TYPE_BOOL)], func(args: Dictionary) -> void:
+	register_command("/pause", [Argument.new("pause", TYPE_BOOL)], func(controller: ConsoleController, args: Dictionary) -> void:
 		var pause: bool = true
 		if args.has("pause"):
 			pause = args["pause"]
 		
 		Console.get_tree().paused = pause
-		Console.log_info("console", "Game paused: %s" % str(pause))
+		controller.log_info("console", "Game paused: %s" % str(pause))
 	)
 	
 	# /set command
@@ -173,42 +187,36 @@ func _register_internal_commands() -> void:
 	], _cmd_set)
 	
 	# /version command
-	register_command("/version", [], func(_args: Dictionary) -> void:
-		Console.log_info("console", "Console version: %s" % Console.get_version())
+	register_command("/version", [], func(controller: ConsoleController, _args: Dictionary) -> void:
+		controller.log_info("console", "Console version: %s" % Console.get_version())
 	)
 	
-	# /fps command
-	register_command("/fps", [], func(_args: Dictionary) -> void:
-		Console.log_info("console", "Current FPS: %s" % str(Engine.get_frames_per_second()))
-	)
-	
-	# /resolution command
-	register_command("/resolution", [], func(_args: Dictionary) -> void:
+	# /stats command -- FPS and Resolution
+	register_command("/stats", [], func(controller: ConsoleController, _args: Dictionary) -> void:
+		controller.log_info("console", "Current FPS: %s" % str(Engine.get_frames_per_second()))
 		var size = DisplayServer.window_get_size()
-		Console.log_info("console", "Current resolution: %dx%d" % [size.x, size.y])
+		controller.log_info("console", "Current resolution: %dx%d" % [size.x, size.y])
 	)
 	
 	# /network command
-	register_command("/network", [], func(_args: Dictionary) -> void:
-		Console.log_info("console", "Local addresses:")
-		for addr in IP.get_local_addresses():
-			Console.log_info("console", "%s" % str(addr))
+	register_command("/network", [], func(controller: ConsoleController, _args: Dictionary) -> void:
+		controller.log_info("console", "Machine network address: %s" % str(get_local_ip()))
 	)
 	
 	# /print command
-	register_command("/print", [Argument.new("quote", TYPE_STRING)], func(args: Dictionary) -> void:
-		Console.log_info("console", args["quote"])
+	register_command("/print", [Argument.new("quote", TYPE_STRING)], func(controller: ConsoleController, args: Dictionary) -> void:
+		controller.log_info("console", args["quote"])
 	)
 
 #region Internal
-func _cmd_set(args: Dictionary) -> void:
+func _cmd_set(controller: ConsoleController, args: Dictionary) -> void:
 	var node_path: String = args["node_path"]
 	var property_name: String = args["property"]
 	var value_str: String = args["value"]
 
-	var target_node := Console.get_node_or_null(node_path)
+	var target_node: Node = Console.get_node_or_null(node_path)
 	if target_node == null:
-		Console.log_error("console", "Node not found: %s" % node_path)
+		controller.log_error("console", "Node not found: %s" % node_path)
 		return
 
 	# Try to convert the value to a sensible type
@@ -221,18 +229,27 @@ func _cmd_set(args: Dictionary) -> void:
 		value = value_str.to_lower() == "true"
 
 	if not target_node.has_property(property_name):
-		Console.log_error("console", "Property '%s' not found on node %s" % [property_name, node_path])
+		controller.log_error("console", "Property '%s' not found on node %s" % [property_name, node_path])
 		return
 
 	target_node.set(property_name, value)
-	Console.log_info("console", "Set %s.%s = %s" % [node_path, property_name, str(value)])
+	controller.log_info("console", "Set %s.%s = %s" % [node_path, property_name, str(value)])
 
 # Print all registered commands
-func _cmd_help(_args: Dictionary) -> void:
+func _cmd_help(controller: ConsoleController, _args: Dictionary) -> void:
 	var all_cmds: Array[String] = get_commands()
 	if all_cmds.size() == 0:
-		Console.log_error("console", " - No commands registered -")
+		controller.log_error("console", " - No commands registered -")
 	else:
-		Console.log_info("console", "Available commands:")
+		controller.log_info("console", "Available commands:")
 		for cmd in all_cmds:
-			Console.log_info("console", "  " + cmd)
+			controller.log_info("console", "  " + cmd)
+
+# Local machine ip
+func get_local_ip() -> String:
+	for ip in IP.get_local_addresses():
+		if ip.count(".") == 3 and not ip.begins_with("127."):
+			# Restrict to private ranges (LAN)
+			if ip.begins_with("10.") or ip.begins_with("192.168.") or (ip.begins_with("172.") and int(ip.split(".")[1]) in range(16, 32)):
+				return ip
+	return "127.0.0.1"

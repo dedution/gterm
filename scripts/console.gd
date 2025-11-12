@@ -1,11 +1,10 @@
 extends Node
 
 var _version : String = "0.0.1"
-var commands: ConsoleCommands
-var console_controller: ConsoleController
+var _commands: ConsoleCommands
 
 func _ready() -> void:
-	commands = ConsoleCommands.new()
+	_commands = ConsoleCommands.new()
 	
 	if console_is_allowed():
 		_spawn_menu()
@@ -17,7 +16,6 @@ func _spawn_menu() -> void:
 	var packed_scene = load(parent_folder + "/%s/%s" % ["scenes", "console.tscn"])
 	var instance = packed_scene.instantiate()
 	add_child(instance)
-	console_controller = instance
 
 func get_version() -> String:
 	return _version
@@ -25,21 +23,11 @@ func get_version() -> String:
 func console_is_allowed() -> bool:
 	return OS.is_debug_build()
 
-#region Logging
-func log_info(log_tag: String, log : String) -> void:
-	if console_controller:
-		console_controller.console_logger.add_log_info(log_tag, log)
-		
-func log_warn(log_tag: String, log : String) -> void:
-	if console_controller:
-		console_controller.console_logger.add_log_warn(log_tag, log)
+func get_commands() -> Array[String]:
+	return _commands.get_commands()
 
-func log_error(log_tag: String, log : String) -> void:
-	if console_controller:
-		console_controller.console_logger.add_log_error(log_tag, log)
+func register_command(command_name: String, command_arguments: Array[Argument], command_action: Callable) -> void:
+	_commands.register_command(command_name, command_arguments, command_action)
 
-func log_clear() -> void:
-	if console_controller:
-		console_controller.console_logger.clear_log()
-
-#endregion
+func run_command(controller: ConsoleController, command_full: String) -> void:
+	_commands.run_command(controller, command_full)
