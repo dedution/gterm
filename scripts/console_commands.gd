@@ -172,7 +172,9 @@ func _register_internal_commands() -> void:
 		var command : String = ""
 		
 		while not file.eof_reached():
-			command += file.get_line() + ";"
+			var line : String = file.get_line()
+			if line.length() > 0 and line[0] != "#":
+				command += line + ";"
 		
 		# Remove last semicolon
 		command = command.substr(0, command.length() - 1)
