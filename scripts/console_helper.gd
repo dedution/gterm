@@ -4,7 +4,6 @@ class_name ConsoleHelper
 # Public: Register all internal commands
 # -----------------------------
 static func register_internal_commands() -> void:
-	# Register all commands using static functions
 	_reg("/sleep", [ConsoleCommands.Argument.new("time", TYPE_FLOAT)], cmd_sleep)
 	_reg("/exec", [ConsoleCommands.Argument.new("file_name", TYPE_STRING)], cmd_exec)
 	_reg("/load_mod", [ConsoleCommands.Argument.new("file_name", TYPE_STRING)], cmd_load_mod)
@@ -27,7 +26,7 @@ static func _reg(name: String, args: Array, func_ref: Callable) -> void:
 # -----------------------------
 
 static func cmd_sleep(controller: ConsoleController, args: Dictionary) -> void:
-	await Console.get_tree().create_timer(args["time"]).timeout
+	await controller.get_tree().create_timer(args["time"]).timeout
 
 static func cmd_exec(controller: ConsoleController, args: Dictionary) -> void:
 	var code = _read_file(args["file_name"])
@@ -68,7 +67,7 @@ static func cmd_game_speed(controller: ConsoleController, args: Dictionary) -> v
 	controller.log_info("console", "Game speed set to: %s" % str(Engine.time_scale))
 
 static func cmd_version(controller: ConsoleController, _args: Dictionary) -> void:
-	controller.log_info("console", "Console version: %s" % Console.get_version())
+	controller.log_info("console", "Console version: %s" % "1.0.0")
 
 static func cmd_stats(controller: ConsoleController, _args: Dictionary) -> void:
 	controller.log_info("console", "Current FPS: %s" % str(Engine.get_frames_per_second()))
