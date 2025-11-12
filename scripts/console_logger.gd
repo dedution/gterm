@@ -4,6 +4,7 @@ extends Control
 @onready var _command_logger: RichTextLabel = $Logs
 
 const MAX_LOGS: int = 300
+const INTRO_PATH : String = "%s/../graphics/intro.txt"
 var _logs: Array[String] = []
 var _first_time: bool = true
 
@@ -18,13 +19,10 @@ func _print_intro() -> void:
 
 	clear_log()
 
-	var ascii_art: String = r"""
-	  ______     ______   ______     ______     __    __    
-	 /\  ___\   /\__  _\ /\  ___\   /\  == \   /\ "-./  \   
-	 \ \ \__ \  \/_/\ \/ \ \  __\   \ \  __<   \ \ \-./\ \  
-	  \ \_____\    \ \_\  \ \_____\  \ \_\ \_\  \ \_\ \ \_\ 
-	   \/_____/     \/_/   \/_____/   \/_/ /_/   \/_/  \/_/
-	"""
+	var script_folder : String = get_script().resource_path.get_base_dir()
+	var intro_anim_path : String = INTRO_PATH % script_folder
+	intro_anim_path = ProjectSettings.localize_path(intro_anim_path)
+	var ascii_art: String = FileAccess.get_file_as_string(intro_anim_path)
 	var current_text = ""
 	
 	# Animate the ascii art
@@ -40,19 +38,7 @@ func _print_intro() -> void:
 			_update_display()
 			await get_tree().process_frame
 
-	# Footer
-	_logs.append("[color=green] Welcome to GTERM by Fabio Barbosa [/color]")
 	_update_display()
-
-
-func add_log_info(log_tag: String, output: String) -> void:
-	add_log(log_tag, output, "white")
-
-func add_log_warn(log_tag: String, output: String) -> void:
-	add_log(log_tag, output, "yellow")
-
-func add_log_error(log_tag: String, output: String) -> void:
-	add_log(log_tag, output, "red")
 
 func add_log(log_tag: String, output: String, color: String = "white") -> void:
 	var line: String = "[color=%s][%s] %s[/color]" % [color, log_tag.to_upper(), output]

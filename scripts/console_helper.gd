@@ -1,8 +1,5 @@
 class_name ConsoleHelper
 
-# -----------------------------
-# Public: Register all internal commands
-# -----------------------------
 static func register_internal_commands() -> void:
 	_reg("/sleep", [ConsoleCommands.Argument.new("time", TYPE_FLOAT)], cmd_sleep)
 	_reg("/exec", [ConsoleCommands.Argument.new("file_name", TYPE_STRING)], cmd_exec)
@@ -20,10 +17,6 @@ static func register_internal_commands() -> void:
 # Helper to simplify registration
 static func _reg(name: String, args: Array, func_ref: Callable) -> void:
 	ConsoleCommands.register_command(name, args, func_ref)
-
-# -----------------------------
-# Command implementations
-# -----------------------------
 
 static func cmd_sleep(controller: ConsoleController, args: Dictionary) -> void:
 	await controller.get_tree().create_timer(args["time"]).timeout
@@ -89,9 +82,7 @@ static func cmd_help(controller: ConsoleController, _args: Dictionary) -> void:
 		for cmd in all_cmds:
 			controller.log_info("console", "  " + cmd)
 
-# -----------------------------
 # Helper functions
-# -----------------------------
 static func _read_file(relative_path: String) -> String:
 	if relative_path.is_empty():
 		return ""

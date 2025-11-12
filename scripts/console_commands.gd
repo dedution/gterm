@@ -1,21 +1,15 @@
 class_name ConsoleCommands
 extends Node
 
-# -----------------------------
-# Static variables
-# -----------------------------
 static var _registered_commands: Dictionary = {}
 static var _int_regex: RegEx = RegEx.new()
 static var _float_regex: RegEx = RegEx.new()
 
-# Initialize regexes
 func _init() -> void:
 	_int_regex.compile("^[+-]?\\d+$")
 	_float_regex.compile("^[+-]?((\\d+\\.\\d*)|(\\d*\\.\\d+)|\\d+)$")
 
-# -----------------------------
-# Public API
-# -----------------------------
+#region Public
 static func get_commands() -> Array[String]:
 	var result: Array[String] = [] 
 	for key in _registered_commands.keys(): 
@@ -26,17 +20,15 @@ static func get_commands() -> Array[String]:
 static func register_command(command_name: String, command_arguments: Array, command_action: Callable) -> void:
 	_registered_commands[command_name] = RegisteredCommand.new(command_arguments, command_action)
 
-
 static func run_command(controller: ConsoleController, command_full: String) -> void:
 	var commands = split_commands(command_full)
 	for cmd in commands:
 		var tokens = tokenize_command(cmd)
 		await process_command(controller, tokens)
 
+#endregion
 
-# -----------------------------
-# Private Helpers
-# -----------------------------
+#region Private
 static func split_commands(command_full: String) -> Array[String]:
 	var result: Array[String] = []
 	var current: String = ""
@@ -105,10 +97,6 @@ static func type_to_string(type_const: int) -> String:
 		_:
 			return "variant"
 
-
-# -----------------------------
-# Process Command
-# -----------------------------
 static func process_command(controller: ConsoleController, tokens: Array) -> void:
 	if tokens.is_empty() or not _registered_commands.has(tokens[0]):
 		controller.log_error("console", "Failed to execute command %s" % tokens[0])
@@ -139,10 +127,9 @@ static func process_command(controller: ConsoleController, tokens: Array) -> voi
 
 	await cmd.action.call(controller, parsed_args)
 
+#endregion
 
-# -----------------------------
 # Helper Classes
-# -----------------------------
 class Argument:
 	var argument_name: String
 	var value_type: int = TYPE_STRING
