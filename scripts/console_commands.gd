@@ -141,6 +141,13 @@ func run_command(controller: ConsoleController, command_full: String) -> void:
 
 
 func _register_internal_commands() -> void:
+	# /sleep command
+	register_command("/sleep", [Argument.new("time", TYPE_FLOAT)], func(controller: ConsoleController, args: Dictionary) -> void:
+		if args.has("time"):
+			var time: float = args["time"]
+			await Console.get_tree().create_timer(time).timeout
+	)
+	
 	# /load_mod command
 	register_command("/load_mod", [Argument.new("file_name", TYPE_STRING)], func(controller: ConsoleController, args: Dictionary) -> void:
 		var mod_file: String = ""
@@ -176,7 +183,19 @@ func _register_internal_commands() -> void:
 			pause = args["pause"]
 		
 		Console.get_tree().paused = pause
+		Engine.time_scale = 0.0 if pause else 1.0
+		
 		controller.log_info("console", "Game paused: %s" % str(pause))
+	)
+	
+	# /game-speed command
+	register_command("/game-speed", [Argument.new("time", TYPE_FLOAT)], func(controller: ConsoleController, args: Dictionary) -> void:
+		var time: float = 1.0
+		if args.has("time"):
+			time = args["time"]
+		
+		Engine.time_scale = time
+		controller.log_info("console", "Game speed set to: %s" % str(Engine.time_scale))
 	)
 	
 	# /set command
