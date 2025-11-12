@@ -202,6 +202,34 @@ func _register_internal_commands() -> void:
 			controller.log_error("PCKLoader", "Failed to load PCK: %s" % mod_file)
 	)
 	
+	# /load_script command
+	register_command("/load_script", [Argument.new("file_name", TYPE_STRING)], func(controller: ConsoleController, args: Dictionary) -> void:
+		var relative_path : String = args["file_name"]
+		
+		if relative_path.is_empty():
+			controller.log_error("console", "File not found: %s" % relative_path)
+			return 
+		
+		var base_path = OS.get_executable_path().get_base_dir()
+		var file_path: String
+		
+		if OS.has_feature("editor"):
+			file_path = ProjectSettings.globalize_path("res://") + relative_path
+		else:
+			file_path = OS.get_executable_path().get_base_dir() + "/" + relative_path
+		
+		var file = FileAccess.open(file_path, FileAccess.READ)
+		if file == null:
+			controller.log_error("console", "Invalid file: %s" % relative_path)
+			return
+		
+		var script : String = file.get_as_text()
+		file.close()
+		controller.log_info("console", "Compiling %s..." % relative_path)
+		
+		_run_text_script(controller, script)
+	)
+	
 	# /help command
 	register_command("/help", [], _cmd_help)
 
@@ -307,3 +335,14 @@ func get_local_ip() -> String:
 			if ip.begins_with("10.") or ip.begins_with("192.168.") or (ip.begins_with("172.") and int(ip.split(".")[1]) in range(16, 32)):
 				return ip
 	return "127.0.0.1"
+	
+	
+func _run_text_script(controller: ConsoleController, code: String):
+	var script = GDScript.new()
+	script.source_code = code
+	var error = script.reload()
+	if error == OK:
+		var side_obj = script.new()
+		side_obj.call("run", controller)
+	else:
+		controller.log_error("console", "Failed to compile script!")
