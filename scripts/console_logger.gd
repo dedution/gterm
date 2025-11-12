@@ -41,8 +41,7 @@ func _print_intro() -> void:
 			await get_tree().process_frame
 
 	# Footer
-	_logs.append("[color=green] Welcome to GTERM by Fabio B [/color]")
-	_logs.append("[color=green] Version %s [/color]" % Console.get_version())
+	_logs.append("[color=green] Welcome to GTERM by Fabio Barbosa [/color]")
 	_update_display()
 
 
