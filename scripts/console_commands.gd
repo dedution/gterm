@@ -148,6 +148,39 @@ func _register_internal_commands() -> void:
 			await Console.get_tree().create_timer(time).timeout
 	)
 	
+	# /exec command
+	register_command("/exec", [Argument.new("file_name", TYPE_STRING)], func(controller: ConsoleController, args: Dictionary) -> void:
+		var relative_path : String = args["file_name"]
+		
+		if relative_path.is_empty():
+			controller.log_error("console", "File not found: %s" % relative_path)
+			return 
+		
+		var base_path = OS.get_executable_path().get_base_dir()
+		var file_path: String
+		
+		if OS.has_feature("editor"):
+			file_path = ProjectSettings.globalize_path("res://") + relative_path
+		else:
+			file_path = OS.get_executable_path().get_base_dir() + "/" + relative_path
+		
+		var file = FileAccess.open(file_path, FileAccess.READ)
+		if file == null:
+			controller.log_error("console", "Invalid file: %s" % relative_path)
+			return
+		
+		var command : String = ""
+		
+		while not file.eof_reached():
+			command += file.get_line() + ";"
+		
+		# Remove last semicolon
+		command = command.substr(0, command.length() - 1)
+		file.close()
+		
+		Console.run_command(controller, command)
+	)
+	
 	# /load_mod command
 	register_command("/load_mod", [Argument.new("file_name", TYPE_STRING)], func(controller: ConsoleController, args: Dictionary) -> void:
 		var mod_file: String = ""
