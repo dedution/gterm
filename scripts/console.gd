@@ -1,4 +1,5 @@
 extends Node
+var _console_controller : ConsoleController
 
 func _ready() -> void:
 	if _console_is_allowed():
@@ -12,6 +13,10 @@ func _spawn_menu() -> void:
 	var packed_scene = load(parent_folder + "/%s/%s" % ["scenes", "console.tscn"])
 	var instance = packed_scene.instantiate()
 	add_child(instance)
-	
+	_console_controller = instance
+
+func _get_console_controller() -> ConsoleController:
+	return _console_controller
+
 func _console_is_allowed() -> bool:
 	return OS.is_debug_build()

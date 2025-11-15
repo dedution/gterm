@@ -10,26 +10,25 @@ func _init() -> void:
 	_float_regex.compile("^[+-]?((\\d+\\.\\d*)|(\\d*\\.\\d+)|\\d+)$")
 
 #region Public
+static func register_command(command_name: String, command_arguments: Array, command_action: Callable) -> void:
+	_registered_commands[command_name] = RegisteredCommand.new(command_arguments, command_action)
+
+static func run_command(controller: ConsoleController, command_full: String) -> void:
+	var commands = _split_commands(command_full)
+	for cmd in commands:
+		var tokens = _tokenize_command(cmd)
+		await _process_command(controller, tokens)
+
 static func get_commands() -> Array[String]:
 	var result: Array[String] = [] 
 	for key in _registered_commands.keys(): 
 		result.append(str(key)) 
 	return result
 
-
-static func register_command(command_name: String, command_arguments: Array, command_action: Callable) -> void:
-	_registered_commands[command_name] = RegisteredCommand.new(command_arguments, command_action)
-
-static func run_command(controller: ConsoleController, command_full: String) -> void:
-	var commands = split_commands(command_full)
-	for cmd in commands:
-		var tokens = tokenize_command(cmd)
-		await process_command(controller, tokens)
-
 #endregion
 
 #region Private
-static func split_commands(command_full: String) -> Array[String]:
+static func _split_commands(command_full: String) -> Array[String]:
 	var result: Array[String] = []
 	var current: String = ""
 	var in_quotes: bool = false
@@ -50,7 +49,7 @@ static func split_commands(command_full: String) -> Array[String]:
 	return result
 
 
-static func tokenize_command(command: String) -> Array[String]:
+static func _tokenize_command(command: String) -> Array[String]:
 	var regex = RegEx.new()
 	regex.compile('("[^"]+"|\\S+)')
 	var matches = regex.search_all(command)
@@ -65,7 +64,7 @@ static func tokenize_command(command: String) -> Array[String]:
 	return tokens
 
 
-static func parse_argument(raw_value: String, type_const: int) -> Variant:
+static func _parse_argument(raw_value: String, type_const: int) -> Variant:
 	match type_const:
 		TYPE_FLOAT:
 			if raw_value.is_valid_float():
@@ -84,7 +83,7 @@ static func parse_argument(raw_value: String, type_const: int) -> Variant:
 	return null
 
 
-static func type_to_string(type_const: int) -> String:
+static func _type_to_string(type_const: int) -> String:
 	match type_const:
 		TYPE_INT:
 			return "int"
@@ -97,7 +96,7 @@ static func type_to_string(type_const: int) -> String:
 		_:
 			return "variant"
 
-static func process_command(controller: ConsoleController, tokens: Array) -> void:
+static func _process_command(controller: ConsoleController, tokens: Array) -> void:
 	if tokens.is_empty() or not _registered_commands.has(tokens[0]):
 		controller.log_error("console", "Failed to execute command %s" % tokens[0])
 		return
@@ -113,19 +112,22 @@ static func process_command(controller: ConsoleController, tokens: Array) -> voi
 	for i in range(cmd.arguments.size()):
 		var arg_def: Argument = cmd.arguments[i]
 		var raw_value: String = tokens[i + 1]
-		var value = parse_argument(raw_value, arg_def.value_type)
+		var value = _parse_argument(raw_value, arg_def.value_type)
 
 		if value == null:
 			controller.log_error(
 				"console",
 				"Argument '%s' has invalid type. Expected %s" %
-				[arg_def.argument_name, type_to_string(arg_def.value_type)]
+				[arg_def.argument_name, _type_to_string(arg_def.value_type)]
 			)
 			return
 
 		parsed_args[arg_def.argument_name] = value
-
-	await cmd.action.call(controller, parsed_args)
+		
+	if cmd.arguments.size() > 0:
+		await cmd.action.call(controller, parsed_args)
+	else:
+		await cmd.action.call(controller)
 
 #endregion
 
@@ -137,7 +139,6 @@ class Argument:
 	func _init(_name: String = "", _type: int = TYPE_STRING) -> void:
 		argument_name = _name
 		value_type = _type
-
 
 class RegisteredCommand:
 	var arguments: Array

@@ -4,4 +4,4 @@
 	  \ \_____\    \ \_\  \ \_____\  \ \_\ \_\  \ \_\ \ \_\ 
 	   \/_____/     \/_/   \/_____/   \/_/ /_/   \/_/  \/_/
 
-Welcome to GTERM by Fabio Barbosa
+	Welcome to GTERM by Fabio Barbosa!

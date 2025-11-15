@@ -46,7 +46,7 @@ static func cmd_load_script(controller: ConsoleController, args: Dictionary) -> 
 	controller.log_info("console", "Compiling %s..." % args["file_name"])
 	run_text_script(controller, script_code)
 
-static func cmd_clear(controller: ConsoleController, _args: Dictionary) -> void:
+static func cmd_clear(controller: ConsoleController) -> void:
 	controller.log_clear()
 
 static func cmd_pause(controller: ConsoleController, args: Dictionary) -> void:
@@ -59,21 +59,21 @@ static func cmd_game_speed(controller: ConsoleController, args: Dictionary) -> v
 	Engine.time_scale = time
 	controller.log_info("console", "Game speed set to: %s" % str(Engine.time_scale))
 
-static func cmd_version(controller: ConsoleController, _args: Dictionary) -> void:
+static func cmd_version(controller: ConsoleController) -> void:
 	controller.log_info("console", "Console version: %s" % "1.0.0")
 
-static func cmd_stats(controller: ConsoleController, _args: Dictionary) -> void:
+static func cmd_stats(controller: ConsoleController) -> void:
 	controller.log_info("console", "Current FPS: %s" % str(Engine.get_frames_per_second()))
 	var size = DisplayServer.window_get_size()
 	controller.log_info("console", "Current resolution: %dx%d" % [size.x, size.y])
 
-static func cmd_network(controller: ConsoleController, _args: Dictionary) -> void:
+static func cmd_network(controller: ConsoleController) -> void:
 	controller.log_info("console", "Machine network address: %s" % get_local_ip())
 
 static func cmd_print(controller: ConsoleController, args: Dictionary) -> void:
 	controller.log_info("console", args["quote"])
 
-static func cmd_help(controller: ConsoleController, _args: Dictionary) -> void:
+static func cmd_help(controller: ConsoleController) -> void:
 	var all_cmds: Array[String] = ConsoleCommands.get_commands()
 	if all_cmds.is_empty():
 		controller.log_error("console", " - No commands registered -")

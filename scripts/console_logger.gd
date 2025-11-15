@@ -27,7 +27,7 @@ func _print_intro() -> void:
 	
 	# Animate the ascii art
 	var frame_count : int = 0
-	var chars_per_frame : int = 3
+	var chars_per_frame : int = 5
 	for char in ascii_art:
 		current_text += char
 		frame_count += 1
@@ -37,7 +37,7 @@ func _print_intro() -> void:
 			_logs.append("[color=green]%s[/color]" % current_text)
 			_update_display()
 			await get_tree().process_frame
-
+	_logs.append("")
 	_update_display()
 
 func add_log(log_tag: String, output: String, color: String = "white") -> void:
