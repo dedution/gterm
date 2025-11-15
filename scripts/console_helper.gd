@@ -11,7 +11,7 @@ static func register_internal_commands() -> void:
 	_reg("/version", [], cmd_version, "Prints the console version")
 	_reg("/stats", [], cmd_stats, "Prints game performance related stats")
 	_reg("/network", [], cmd_network, "Prints network related stats")
-	_reg("/print", [ConsoleCommands.Argument.new("quote", TYPE_STRING)], cmd_print, "Prints words into the console")
+	_reg("/print", [ConsoleCommands.Argument.new("text", TYPE_STRING)], cmd_print, "Prints words into the console")
 	_reg("/help", [], cmd_help, "Lists the available commands")
 
 # Helper to simplify registration
@@ -71,7 +71,7 @@ static func cmd_network(controller: ConsoleController) -> void:
 	controller.log_info("console", "Machine network address: %s" % get_local_ip())
 
 static func cmd_print(controller: ConsoleController, args: Dictionary) -> void:
-	controller.log_info("console", args["quote"])
+	controller.log_info("console", args["text"])
 
 static func cmd_help(controller: ConsoleController) -> void:
 	var all_cmds: Array[String] = ConsoleCommands.get_commands()

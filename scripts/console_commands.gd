@@ -103,13 +103,16 @@ static func _type_to_string(type_const: int) -> String:
 
 static func _process_command(controller: ConsoleController, tokens: Array) -> void:
 	if tokens.is_empty() or not _registered_commands.has(tokens[0]):
-		controller.log_error("console", "Failed to execute command %s" % tokens[0])
+		controller.log_error("console", "Failed to execute command [i]%s[/i]" % tokens[0])
 		return
 
 	var cmd: RegisteredCommand = _registered_commands[tokens[0]]
 
-	if cmd.arguments.size() != tokens.size() - 1:
-		controller.log_error("console", "Arguments for command %s don't match" % tokens[0])
+	if cmd.arguments.size() > 0 and cmd.arguments.size() != tokens.size() - 1:
+		controller.log_error("console", "Arguments for command [i]%s[/i] don't match" % tokens[0])
+		controller.log_info("console", "Expected:")
+		for argument in cmd.arguments:
+			controller.log_info("console", "	[i]%s[/i] (%s)" % [argument.argument_name, _type_to_string(argument.value_type)])
 		return
 
 	var parsed_args: Dictionary = {}
@@ -128,7 +131,8 @@ static func _process_command(controller: ConsoleController, tokens: Array) -> vo
 			return
 
 		parsed_args[arg_def.argument_name] = value
-		
+	
+	# Simple commands can have simpler callable parameters
 	if cmd.arguments.size() > 0:
 		await cmd.action.call(controller, parsed_args)
 	else:
