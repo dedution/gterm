@@ -44,13 +44,13 @@ Usage Example
 Register a custom command:
 
 	Console.register_command("/greet", [Argument.new("name", TYPE_STRING)], func(controller: ConsoleController, args: Dictionary) -> void:
-		Console.log_info("console", "Hello, %s!" % args["name"])
+		controller.log_info("console", "Hello, %s!" % args["name"])
     )
 
 Log messages:
-	controller.log_info("console", "Custom message here")
-	controller.log_warn("console", "Custom message here")
-	controller.log_error("console", "Custom message here")
+- controller.log_info("console", "Custom message here")
+- controller.log_warn("console", "Custom message here")
+- controller.log_error("console", "Custom message here")
 
 ---
 

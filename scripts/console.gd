@@ -15,7 +15,7 @@ func _spawn_menu() -> void:
 	add_child(instance)
 	_console_controller = instance
 
-func _get_console_controller() -> ConsoleController:
+func get_console_controller() -> ConsoleController:
 	return _console_controller
 
 func _console_is_allowed() -> bool:
