@@ -6,26 +6,17 @@ extends Control
 const MAX_LOGS: int = 300
 const INTRO_PATH : String = "%s/../graphics/intro.txt"
 var _logs: Array[String] = []
-var _first_time: bool = true
 
 func open_console() -> void:
 	_print_intro()
 	
 func _print_intro() -> void:
-	if _first_time:
-		_first_time = false
-	else:
-		return
-
+	# Get the ascii art to animate and clear current logs
+	var ascii_art = get_ascii_art()
 	clear_log()
-
-	var script_folder : String = get_script().resource_path.get_base_dir()
-	var intro_anim_path : String = INTRO_PATH % script_folder
-	intro_anim_path = ProjectSettings.localize_path(intro_anim_path)
-	var ascii_art: String = FileAccess.get_file_as_string(intro_anim_path)
-	var current_text = ""
 	
 	# Animate the ascii art
+	var current_text = ""
 	var frame_count : int = 0
 	var chars_per_frame : int = 5
 	for char in ascii_art:
@@ -34,14 +25,48 @@ func _print_intro() -> void:
 		if frame_count >= chars_per_frame:
 			frame_count = 0
 			_logs.clear()
-			_logs.append("[color=green]%s[/color]" % current_text)
+			_logs.append(rainbow_text(current_text))
 			_update_display()
 			await get_tree().process_frame
+	
+	# Remaining chars
+	if frame_count > 0:
+		_logs.clear()
+		_logs.append(rainbow_text(current_text))
+		_update_display()
+		await get_tree().process_frame
+	
+	# Line break
 	_logs.append("")
 	_update_display()
 
+func rainbow_text(text: String) -> String:
+	var result : String = ""
+	var hue : float = 0.0
+	var hue_step : float = 1.0 / max(text.length(), 1)  # full rainbow over the whole length
+
+	for c in text:
+		var col := Color.from_hsv(hue, 1.0, 1.0)
+		result += "[color=%s]%s[/color]" % [col.to_html(false), c]
+		hue += hue_step
+
+	return result
+
+func get_ascii_art() -> String:
+	var script_folder : String = get_script().resource_path.get_base_dir()
+	var intro_anim_path : String = INTRO_PATH % script_folder
+	intro_anim_path = ProjectSettings.localize_path(intro_anim_path)
+	var ascii_art: String = FileAccess.get_file_as_string(intro_anim_path)
+	return ascii_art % Console.get_version()
+
 func add_log(log_tag: String, output: String, color: String = "white") -> void:
-	var line: String = "[color=%s][%s] %s[/color]" % [color, log_tag.to_upper(), output]
+	var line: String = "[%s] %s" % [log_tag.to_upper(), output]
+	
+	if color == "rainbow":
+		line =  "[%s] %s" % [log_tag.to_upper(), rainbow_text(output)] 
+	else:
+		line = "[color=%s]%s[/color]" % [color, line]
+		
 	_logs.append(line)
 	if _logs.size() > MAX_LOGS:
 		_logs.pop_front()

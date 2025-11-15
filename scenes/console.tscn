@@ -1,12 +1,12 @@
 [gd_scene load_steps=15 format=3 uid="uid://c84qsww8l6awf"]
 
-[ext_resource type="Script" uid="uid://dx0k1rnm7ghqv" path="res://godot-debug-console/scripts/console_controller.gd" id="1_2mre8"]
-[ext_resource type="Theme" uid="uid://b2c12ppu4s4lr" path="res://godot-debug-console/themes/text_theme.tres" id="2_kirbc"]
-[ext_resource type="Texture2D" uid="uid://b8ad5dmrlpcn3" path="res://godot-debug-console/graphics/console_indicator.png" id="3_es1fy"]
-[ext_resource type="Script" uid="uid://bqqgsfdibecfs" path="res://godot-debug-console/scripts/console_writer.gd" id="4_es1fy"]
-[ext_resource type="Script" uid="uid://bcfw7niumljx5" path="res://godot-debug-console/scripts/console_hints.gd" id="4_umce0"]
-[ext_resource type="Script" uid="uid://c7nnxl7qshfw6" path="res://godot-debug-console/scripts/console_logger.gd" id="5_es7mf"]
-[ext_resource type="FontFile" uid="uid://ltbm7va13t7p" path="res://godot-debug-console/fonts/RobotoMono-Regular.ttf" id="6_kirbc"]
+[ext_resource type="Script" uid="uid://dx0k1rnm7ghqv" path="res://addons/gterm/scripts/console_controller.gd" id="1_2mre8"]
+[ext_resource type="Theme" uid="uid://b2c12ppu4s4lr" path="res://addons/gterm/themes/text_theme.tres" id="2_kirbc"]
+[ext_resource type="Texture2D" uid="uid://b8ad5dmrlpcn3" path="res://addons/gterm/graphics/console_indicator.png" id="3_es1fy"]
+[ext_resource type="Script" uid="uid://bqqgsfdibecfs" path="res://addons/gterm/scripts/console_writer.gd" id="4_es1fy"]
+[ext_resource type="Script" uid="uid://bcfw7niumljx5" path="res://addons/gterm/scripts/console_hints.gd" id="4_umce0"]
+[ext_resource type="Script" uid="uid://c7nnxl7qshfw6" path="res://addons/gterm/scripts/console_logger.gd" id="5_es7mf"]
+[ext_resource type="FontFile" uid="uid://ltbm7va13t7p" path="res://addons/gterm/fonts/RobotoMono-Regular.ttf" id="6_kirbc"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kirbc"]
 content_margin_left = 6.0
@@ -37,8 +37,10 @@ size_flags_horizontal = 3
 script = ExtResource("1_2mre8")
 
 [node name="Window" type="Window" parent="."]
+physics_interpolation_mode = 2
+anisotropic_filtering_level = 0
 oversampling_override = 1.0
-title = "GTERM"
+title = "GTerm"
 initial_position = 1
 size = Vector2i(620, 750)
 minimize_disabled = true
@@ -145,7 +147,7 @@ clip_contents = true
 custom_minimum_size = Vector2(0, 125)
 layout_mode = 2
 script = ExtResource("4_umce0")
-buttons = [NodePath("Root/BoxContainer/Button"), NodePath("Root/BoxContainer/Button2"), NodePath("Root/BoxContainer/Button3")]
+buttons = [NodePath("Root/SuggestionContainer/suggestion_bt_01"), NodePath("Root/SuggestionContainer/suggestion_bt_02"), NodePath("Root/SuggestionContainer/suggestion_bt_03")]
 
 [node name="Root" type="Control" parent="Window/Container/VBoxContainer/Hints"]
 layout_mode = 1
@@ -195,7 +197,7 @@ tab_input_mode = false
 scroll_smooth = true
 use_default_word_separators = false
 
-[node name="BoxContainer" type="BoxContainer" parent="Window/Container/VBoxContainer/Hints/Root"]
+[node name="SuggestionContainer" type="BoxContainer" parent="Window/Container/VBoxContainer/Hints/Root"]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.102
@@ -205,7 +207,7 @@ grow_horizontal = 2
 grow_vertical = 2
 vertical = true
 
-[node name="Button" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/BoxContainer"]
+[node name="suggestion_bt_01" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/SuggestionContainer"]
 custom_minimum_size = Vector2(0, 38.51)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_kirbc")
@@ -214,7 +216,7 @@ text = "/wait"
 flat = true
 alignment = 0
 
-[node name="Button2" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/BoxContainer"]
+[node name="suggestion_bt_02" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/SuggestionContainer"]
 custom_minimum_size = Vector2(0, 38.51)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_kirbc")
@@ -223,7 +225,7 @@ text = "/wait"
 flat = true
 alignment = 0
 
-[node name="Button3" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/BoxContainer"]
+[node name="suggestion_bt_03" type="Button" parent="Window/Container/VBoxContainer/Hints/Root/SuggestionContainer"]
 custom_minimum_size = Vector2(0, 38.51)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_kirbc")

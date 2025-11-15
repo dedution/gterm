@@ -20,3 +20,6 @@ func get_console_controller() -> ConsoleController:
 
 func _console_is_allowed() -> bool:
 	return OS.is_debug_build()
+
+func get_version() -> String:
+	return "1.0.0"

@@ -10,8 +10,8 @@ func _init() -> void:
 	_float_regex.compile("^[+-]?((\\d+\\.\\d*)|(\\d*\\.\\d+)|\\d+)$")
 
 #region Public
-static func register_command(command_name: String, command_arguments: Array, command_action: Callable) -> void:
-	_registered_commands[command_name] = RegisteredCommand.new(command_arguments, command_action)
+static func register_command(command_name: String, command_arguments: Array, command_action: Callable, description : String = "") -> void:
+	_registered_commands[command_name] = RegisteredCommand.new(command_arguments, command_action, description)
 
 static func run_command(controller: ConsoleController, command_full: String) -> void:
 	var commands = _split_commands(command_full)
@@ -24,6 +24,11 @@ static func get_commands() -> Array[String]:
 	for key in _registered_commands.keys(): 
 		result.append(str(key)) 
 	return result
+	
+static func get_command_by_id(command_name : String) -> RegisteredCommand:
+	if _registered_commands.has(command_name):
+		return _registered_commands[command_name]
+	return null
 
 #endregion
 
@@ -143,7 +148,9 @@ class Argument:
 class RegisteredCommand:
 	var arguments: Array
 	var action: Callable
+	var description: String
 
-	func _init(_args: Array, _action: Callable) -> void:
+	func _init(_args: Array, _action: Callable, _description: String = "") -> void:
 		arguments = _args.duplicate()
 		action = _action
+		description = _description

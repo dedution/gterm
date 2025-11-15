@@ -1,22 +1,22 @@
 class_name ConsoleHelper
 
 static func register_internal_commands() -> void:
-	_reg("/sleep", [ConsoleCommands.Argument.new("time", TYPE_FLOAT)], cmd_sleep)
-	_reg("/exec", [ConsoleCommands.Argument.new("file_name", TYPE_STRING)], cmd_exec)
-	_reg("/load_mod", [ConsoleCommands.Argument.new("file_name", TYPE_STRING)], cmd_load_mod)
-	_reg("/load_script", [ConsoleCommands.Argument.new("file_name", TYPE_STRING)], cmd_load_script)
-	_reg("/clear", [], cmd_clear)
-	_reg("/pause", [ConsoleCommands.Argument.new("pause", TYPE_BOOL)], cmd_pause)
-	_reg("/game-speed", [ConsoleCommands.Argument.new("time", TYPE_FLOAT)], cmd_game_speed)
-	_reg("/version", [], cmd_version)
-	_reg("/stats", [], cmd_stats)
-	_reg("/network", [], cmd_network)
-	_reg("/print", [ConsoleCommands.Argument.new("quote", TYPE_STRING)], cmd_print)
-	_reg("/help", [], cmd_help)
+	_reg("/sleep", [ConsoleCommands.Argument.new("time", TYPE_FLOAT)], cmd_sleep, "Sleeps for a given time")
+	_reg("/exec", [ConsoleCommands.Argument.new("file_name", TYPE_STRING)], cmd_exec, "Executes a .cfg file containing commands")
+	_reg("/load_mod", [ConsoleCommands.Argument.new("file_name", TYPE_STRING)], cmd_load_mod, "Loads a .pck mod file")
+	_reg("/load_script", [ConsoleCommands.Argument.new("file_name", TYPE_STRING)], cmd_load_script, "Loads a .gd script and executes its 'run' function")
+	_reg("/clear", [], cmd_clear, "Clears console logs")
+	_reg("/pause", [ConsoleCommands.Argument.new("pause", TYPE_BOOL)], cmd_pause, "Pauses and unpauses the game")
+	_reg("/game-speed", [ConsoleCommands.Argument.new("time", TYPE_FLOAT)], cmd_game_speed, "Sets the current game speed")
+	_reg("/version", [], cmd_version, "Prints the console version")
+	_reg("/stats", [], cmd_stats, "Prints game performance related stats")
+	_reg("/network", [], cmd_network, "Prints network related stats")
+	_reg("/print", [ConsoleCommands.Argument.new("quote", TYPE_STRING)], cmd_print, "Prints words into the console")
+	_reg("/help", [], cmd_help, "Lists the available commands")
 
 # Helper to simplify registration
-static func _reg(name: String, args: Array, func_ref: Callable) -> void:
-	ConsoleCommands.register_command(name, args, func_ref)
+static func _reg(name: String, args: Array, func_ref: Callable, description : String = "") -> void:
+	ConsoleCommands.register_command(name, args, func_ref, description)
 
 static func cmd_sleep(controller: ConsoleController, args: Dictionary) -> void:
 	await controller.get_tree().create_timer(args["time"]).timeout
@@ -60,7 +60,7 @@ static func cmd_game_speed(controller: ConsoleController, args: Dictionary) -> v
 	controller.log_info("console", "Game speed set to: %s" % str(Engine.time_scale))
 
 static func cmd_version(controller: ConsoleController) -> void:
-	controller.log_info("console", "Console version: %s" % "1.0.0")
+	controller.log_info("console", "Console version: %s" % Console.get_version())
 
 static func cmd_stats(controller: ConsoleController) -> void:
 	controller.log_info("console", "Current FPS: %s" % str(Engine.get_frames_per_second()))
@@ -78,9 +78,13 @@ static func cmd_help(controller: ConsoleController) -> void:
 	if all_cmds.is_empty():
 		controller.log_error("console", " - No commands registered -")
 	else:
-		controller.log_info("console", "Available commands:")
+		controller.log_rainbow("console", "Available commands:")
 		for cmd in all_cmds:
-			controller.log_info("console", "  " + cmd)
+			var cmd_description: String = ConsoleCommands.get_command_by_id(cmd).description
+			if cmd_description.is_empty():
+				controller.log_info("console", "  [i]%s[/i]" % [cmd])
+			else:
+				controller.log_info("console", "  [i]%s[/i] - (%s)" % [cmd, cmd_description])
 
 # Helper functions
 static func _read_file(relative_path: String) -> String:
