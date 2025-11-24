@@ -1,11 +1,11 @@
 class_name ConsoleLogger
 extends Control
 
-@onready var _command_logger: RichTextLabel = $Logs
-
 const MAX_LOGS: int = 300
 const INTRO_PATH : String = "%s/../graphics/intro.txt"
 var _logs: Array[String] = []
+
+@onready var _command_logger: RichTextLabel = $Logs
 
 func open_console() -> void:
 	_print_intro()

@@ -14,24 +14,23 @@ func _ready() -> void:
 	ConsoleCommands.register_command("/center", [], _center_window, "Centers the console window")
 
 func _center_window(controller: ConsoleController) -> void:
-	var screen_size = DisplayServer.screen_get_size()
+	var screen_size = get_viewport().get_visible_rect().size
 	var win_size = _window.size
 
 	# Detect tall screens (e.g. 1920x3240 or anything >1.3 aspect ratio)
 	# Experimental. Test on more screen ratios
 	var is_tall = screen_size.y > screen_size.x * 1.3
-
 	if is_tall:
 		var x = (screen_size.x - win_size.x) * 0.5
-		var y = screen_size.y - win_size.y
+		var y = screen_size.y - win_size.y - 150.0
 		_window.position = Vector2(x, y)
 	else:
 		_window.popup_centered()
 
 func _open_menu() -> void:
 	_window.title = "GTerm - v%s" % Console.get_version()
-	_center_window(null)
 	_window.visible = true
+	_center_window(null)
 	_window.grab_focus()
 	_writer.grab_focus()
 	_logger.open_console()
