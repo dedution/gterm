@@ -15,7 +15,7 @@ func process_suggestions(command: String) -> void:
 		_clear_buttons()
 		return
 
-	var all_commands: Array[String] = ConsoleCommands.get_commands()
+	var all_commands: Array[String] = Debug.commands.get_commands()
 	var matches: Array[String] = []
 
 	var command_parts := command.split(";", false)

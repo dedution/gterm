@@ -11,7 +11,7 @@ func _ready() -> void:
 	_close_menu()
 	
 	# Register command to center window
-	ConsoleCommands.register_command("/center", [], _center_window, "Centers the console window")
+	Debug.commands.register("/center", {}, _center_window, "Centers the console window")
 
 func _center_window(controller: ConsoleController) -> void:
 	var screen_size = get_viewport().get_visible_rect().size
@@ -48,7 +48,7 @@ func _on_input_submitted(command: String) -> void:
 	_writer.editable = false
 	
 	log_info("console", command)
-	await ConsoleCommands.run_command(self, command)
+	await Debug.commands.run(self, command)
 	_writer.editable = true
 	_writer.grab_focus()
 
