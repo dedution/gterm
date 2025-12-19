@@ -3,11 +3,19 @@ extends Control
 
 const MAX_LOGS: int = 300
 const INTRO_PATH : String = "%s/../graphics/intro.txt"
-var _logs: Array[String] = []
+
+@export var startup_sound: AudioStream
+@export var audio_player: AudioStreamPlayer
 
 @onready var _command_logger: RichTextLabel = $Logs
 
+var _logs: Array[String] = []
+
 func open_console() -> void:
+	if startup_sound and audio_player:
+		audio_player.stream = startup_sound
+		audio_player.play()
+		
 	_print_intro()
 	
 func _print_intro() -> void:

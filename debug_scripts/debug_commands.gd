@@ -1,5 +1,5 @@
 class_name DebugCommands
-extends Node
+extends RefCounted
 
 var _registered_commands: Dictionary = {}
 
