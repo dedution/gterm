@@ -19,7 +19,7 @@ func _init(manager: Node):
 
 	var root_folder: String = get_script().resource_path.get_base_dir().get_base_dir()
 	_body_data = _get_text_file_content(root_folder + _interface_file)
-	_font_data = _get_binary_file_content(root_folder + _font_file)
+	_font_data = _get_font_data(root_folder + _font_file)
 
 
 func _get_text_file_content(file_path: String) -> String:
@@ -30,12 +30,14 @@ func _get_text_file_content(file_path: String) -> String:
 	return file.get_as_text()
 
 
-func _get_binary_file_content(file_path: String) -> PackedByteArray:
-	var file := FileAccess.open(file_path, FileAccess.READ)
-	if file == null:
-		push_error("GTERM failed to load web font: %s" % file_path)
+func _get_font_data(font_path: String) -> PackedByteArray:
+	# TrueType files are imported by Godot and their original source file is not
+	# preserved in exported PCKs. FontFile retains the original font bytes.
+	var font := ResourceLoader.load(font_path, "FontFile") as FontFile
+	if font == null:
+		push_error("GTERM failed to load web font: %s" % font_path)
 		return PackedByteArray()
-	return file.get_buffer(file.get_length())
+	return font.get_data()
 
 
 func update_page_data(websocket_port: int) -> void:
@@ -47,7 +49,6 @@ func update_page_data(websocket_port: int) -> void:
 	_body_data = _body_data.replace("___BANNER_SECTION___", banner)
 	_body_data = _body_data.replace("___MACHINE_IP___", machine_ip)
 	_body_data = _body_data.replace("___WEBSOCKET_PORT___", str(websocket_port))
-	_body_data = _body_data.replace("___FONT_DATA___", Marshalls.raw_to_base64(_font_data))
 
 
 func _escape_html(value: String) -> String:
