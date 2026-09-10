@@ -211,6 +211,11 @@ static func _resolve_file_path(relative_path: String) -> String:
 
 
 static func get_local_ip() -> String:
+	if OS.get_name() == "iOS":
+		var wifi_ip := _get_interface_ipv4("en0")
+		if not wifi_ip.is_empty():
+			return wifi_ip
+
 	for ip in IP.get_local_addresses():
 		if ip.count(".") == 3 and not ip.begins_with("127."):
 			if (
@@ -220,6 +225,22 @@ static func get_local_ip() -> String:
 			):
 				return ip
 	return "127.0.0.1"
+
+
+static func _get_interface_ipv4(interface_name: String) -> String:
+	for interface: Dictionary in IP.get_local_interfaces():
+		if interface.get("name", "") != interface_name:
+			continue
+
+		for address: String in interface.get("addresses", []):
+			if (
+				address.is_valid_ip_address()
+				and address.count(".") == 3
+				and not address.begins_with("127.")
+				and not address.begins_with("169.254.")
+			):
+				return address
+	return ""
 
 
 static func _run_text_script(handler: ConsoleHandler, code: String) -> void:
